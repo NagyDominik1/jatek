@@ -2,7 +2,7 @@
    MAIN — állapot és összekötés
 ═══════════════════════════════════════════════ */
 
-import { $, replay } from './dom.js';
+import { $, esc, replay } from './dom.js';
 import { buildDeck, buildRuleSet } from './rules.js';
 import * as prefs from './prefs.js';
 import * as fx from './fx.js';
@@ -240,8 +240,9 @@ function applyWheelOutcome(outcome, pourer) {
     verdict.innerHTML = `<b>Megúsztad.</b> A pohár marad, te meg röhögsz. 🎉`;
   } else if (outcome === 'extra') {
     stage.classList.remove('is-saved');
+    // a név a játékostól jön: escapelni KELL, mielőtt HTML-be kerül
     verdict.innerHTML = pourer
-      ? `Megy le a <b>King's Cup</b> — és ${pourer.emoji} <b>${pourer.name}</b> még tölt is bele. 💀`
+      ? `Megy le a <b>King's Cup</b> — és ${pourer.emoji} <b>${esc(pourer.name)}</b> még tölt is bele. 💀`
       : `Megy le a <b>King's Cup</b> — még egy itallal megfejelve. 💀`;
     fx.shake(stage);
   } else {
