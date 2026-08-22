@@ -1,0 +1,166 @@
+/* ═══════════════════════════════════════════════
+   TOKENS — paletta, témák, méretskála
+   Minden szín szemantikus tokenen keresztül megy,
+   így a sötét téma csak ezt a réteget írja felül.
+═══════════════════════════════════════════════ */
+
+:root {
+  /* nyers paletta (nem használjuk közvetlenül a komponensekben) */
+  --raw-cream:  #f4ead5;
+  --raw-peach:  #f4a261;
+  --raw-sage:   #87a878;
+  --raw-rust:   #c75146;
+  --raw-ink:    #2b2018;
+  --raw-ochre:  #c9973f;
+  --raw-plum:   #9c6b8e;
+  --raw-gold:   #d4a017;
+
+  /* ── kategória-akcentusok ── */
+  --cat-drink:  #d4834a;
+  --cat-rule:   #6a8a5e;
+  --cat-round:  #b8862f;
+  --cat-social: #8a5a7c;
+  --cat-duel:   #c75146;
+  --cat-king:   #b8860b;
+
+  /* ── felületek ── */
+  --bg:         #f4ead5;
+  --bg-glow:    #fbf4e5;
+  --surface:    rgba(255, 255, 255, .55);
+  --surface-2:  rgba(255, 255, 255, .78);
+  --card-bg:    #fffdf7;
+  --note-bg:    #fffdf4;
+  --line:       rgba(43, 32, 24, .14);
+  --line-soft:  rgba(43, 32, 24, .07);
+
+  /* ── szöveg ── */
+  --text:       #2b2018;
+  --text-dim:   rgba(43, 32, 24, .58);
+  --text-faint: rgba(43, 32, 24, .38);
+  --on-accent:  #fffdf7;
+
+  /* ── akcentusok ── */
+  --accent:     #c75146;
+  --accent-d:   #a83e34;
+  --accent-2:   #f4a261;
+  --accent-2d:  #d4834a;
+  --accent-3:   #87a878;
+  --accent-3d:  #6a8a5e;
+
+  /* ── árnyék ── */
+  --shadow-1:   0 2px 6px rgba(43, 32, 24, .09);
+  --shadow-2:   0 8px 28px rgba(43, 32, 24, .15);
+  --shadow-3:   0 18px 48px rgba(43, 32, 24, .22);
+  --card-shadow-color: rgba(43, 32, 24, .28);
+
+  --noise-opacity: .045;
+  --noise-blend:   normal;
+
+  /* ── forma ── */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+
+  /* ── mozgás ── */
+  --spring: cubic-bezier(.34, 1.4, .5, 1);
+  --ease:   cubic-bezier(.4, 0, .2, 1);
+  --flip-dur: 620ms;
+
+  /* ── biztonságos zónák (notch / home indicator) ── */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  color-scheme: light;
+}
+
+/* ═══════════════════════════════════════════════
+   ÉJSZAKAI TÉMA
+   Ugyanaz a meleg paletta, megfordítva: mély ink
+   háttér, cream szöveg, izzóbb akcentusok — hogy
+   este 11-kor, sötét szobában ne vakítson.
+═══════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cat-drink:  #f0a868;
+    --cat-rule:   #9dc48b;
+    --cat-round:  #e0b155;
+    --cat-social: #c48fb4;
+    --cat-duel:   #e8776a;
+    --cat-king:   #f0c34a;
+
+    --bg:         #17110d;
+    --bg-glow:    #241a13;
+    --surface:    rgba(255, 246, 230, .06);
+    --surface-2:  rgba(255, 246, 230, .11);
+    --card-bg:    #241a14;
+    --note-bg:    #2b201a;
+    --line:       rgba(244, 234, 213, .16);
+    --line-soft:  rgba(244, 234, 213, .08);
+
+    --text:       #f2e6d0;
+    --text-dim:   rgba(242, 230, 208, .62);
+    --text-faint: rgba(242, 230, 208, .36);
+    --on-accent:  #17110d;
+
+    --accent:     #e8776a;
+    --accent-d:   #c75146;
+    --accent-2:   #f0a868;
+    --accent-2d:  #cf8547;
+    --accent-3:   #9dc48b;
+    --accent-3d:  #7ba169;
+
+    --shadow-1:   0 2px 6px rgba(0, 0, 0, .4);
+    --shadow-2:   0 8px 28px rgba(0, 0, 0, .5);
+    --shadow-3:   0 18px 48px rgba(0, 0, 0, .62);
+    --card-shadow-color: rgba(0, 0, 0, .6);
+
+    --noise-opacity: .038;
+    --noise-blend:   normal;
+
+    color-scheme: dark;
+  }
+}
+
+/* kézi kapcsoló — mindkét irányban felülírja a rendszert */
+:root[data-theme="dark"] {
+  --cat-drink:  #f0a868;
+  --cat-rule:   #9dc48b;
+  --cat-round:  #e0b155;
+  --cat-social: #c48fb4;
+  --cat-duel:   #e8776a;
+  --cat-king:   #f0c34a;
+
+  --bg:         #17110d;
+  --bg-glow:    #241a13;
+  --surface:    rgba(255, 246, 230, .06);
+  --surface-2:  rgba(255, 246, 230, .11);
+  --card-bg:    #241a14;
+  --note-bg:    #2b201a;
+  --line:       rgba(244, 234, 213, .16);
+  --line-soft:  rgba(244, 234, 213, .08);
+
+  --text:       #f2e6d0;
+  --text-dim:   rgba(242, 230, 208, .62);
+  --text-faint: rgba(242, 230, 208, .36);
+  --on-accent:  #17110d;
+
+  --accent:     #e8776a;
+  --accent-d:   #c75146;
+  --accent-2:   #f0a868;
+  --accent-2d:  #cf8547;
+  --accent-3:   #9dc48b;
+  --accent-3d:  #7ba169;
+
+  --shadow-1:   0 2px 6px rgba(0, 0, 0, .4);
+  --shadow-2:   0 8px 28px rgba(0, 0, 0, .5);
+  --shadow-3:   0 18px 48px rgba(0, 0, 0, .62);
+  --card-shadow-color: rgba(0, 0, 0, .6);
+
+  --noise-opacity: .038;
+  --noise-blend:   normal;
+
+  color-scheme: dark;
+}

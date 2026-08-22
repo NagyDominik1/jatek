@@ -1,0 +1,1211 @@
+/* ═══════════════════════════════════════════════
+   SCREENS — setup / game / end
+═══════════════════════════════════════════════ */
+
+/* ═══════════════════════════════
+   SETUP
+═══════════════════════════════ */
+#setup-screen.active {
+  justify-content: center;
+  gap: 22px;
+  padding-block: calc(var(--sat) + 28px) calc(var(--sab) + 28px);
+}
+
+.setup-head {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── kártyalegyező ──
+   Három lap, mint egy leterített kéz: a lobbi így nem
+   egy névbekérő űrlap, hanem a játék felütése. */
+.card-fan {
+  display: flex;
+  align-items: flex-end;
+  height: 92px;
+  margin-bottom: -6px;
+}
+.fan-card {
+  width: 58px;
+  height: 81px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-size: 26px;
+  font-style: normal;
+  line-height: 1;
+  box-shadow: var(--shadow-2);
+  transform-origin: 50% 100%;
+  animation: fanFloat 5.2s ease-in-out infinite;
+}
+.fan-back {
+  background-color: var(--accent);
+  background-image:
+    repeating-linear-gradient( 45deg, rgba(255,255,255,.09) 0 4px, transparent 4px 9px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.09) 0 4px, transparent 4px 9px);
+  border: 2px solid color-mix(in srgb, #fff 28%, transparent);
+}
+.fan-face {
+  background: var(--card-bg);
+  border: 2px solid var(--cat-king);
+  z-index: 2;
+}
+.card-fan .fan-card:nth-child(1) { transform: rotate(-15deg) translateY(6px); margin-right: -20px; animation-delay: -1.7s; }
+.card-fan .fan-card:nth-child(2) { transform: translateY(-6px) scale(1.06); }
+.card-fan .fan-card:nth-child(3) { transform: rotate(15deg) translateY(6px);  margin-left: -20px;  animation-delay: -3.4s; }
+
+@keyframes fanFloat {
+  50% { translate: 0 -6px; }
+}
+
+/* ── élő asztal-összegzés ── */
+.table-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 14px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: .02em;
+  color: var(--text-faint);
+  text-align: center;
+  min-height: 18px;
+}
+/* az egyes tételek egyben maradjanak — a „kb. 19 / perc" törés csúnya */
+.table-summary span { white-space: nowrap; }
+.table-summary b { color: var(--text-dim); font-weight: 500; }
+
+/* ── összecsukható szabály-emlékeztető ──
+   Aki még sose játszott, ne a többiektől kelljen kérdeznie. */
+.rules-box {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+.rules-summary {
+  padding: 11px 16px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 14px;
+  color: var(--text-dim);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rules-summary::-webkit-details-marker { display: none; }
+.rules-summary::after {
+  content: '▾';
+  font-size: 12px;
+  transition: transform .2s var(--ease);
+}
+.rules-box[open] .rules-summary::after { transform: rotate(180deg); }
+.rules-box[open] .rules-summary { border-bottom: 1px solid var(--line); }
+
+.rules-list {
+  margin: 0;
+  padding: 12px 18px 14px 34px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-dim);
+  animation: rowIn .22s var(--ease);
+}
+.rules-list li { margin-bottom: 7px; }
+.rules-list li:last-child { margin-bottom: 0; }
+.rules-list li::marker { color: var(--accent-2); font-weight: 600; }
+.rules-list b { color: var(--text); font-weight: 600; }
+
+.setup-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(48px, 13vw, 86px);
+  line-height: 1.02;
+  color: var(--accent);
+  text-shadow: 4px 4px 0 var(--line-soft);
+}
+
+.setup-sub {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: clamp(14px, 3.6vw, 17px);
+  color: var(--text-dim);
+  margin-top: 10px;
+}
+
+.players-wrap {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.setup-actions {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hat-nyolc játékosnál a névsor túlnyúlik a képernyőn. Az Indítás
+   ne ússzon el a lap aljára: odatapad az alsó élhez, így egy
+   hüvelykujjal elérhető marad görgetés közben is. */
+.setup-cta {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 calc(var(--sab) + 12px);
+  background: linear-gradient(to top, var(--bg) 0 76%, transparent);
+}
+
+.err {
+  min-height: 20px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 14px;
+  text-align: center;
+  color: var(--accent);
+}
+
+.setup-tools {
+  position: fixed;
+  top: calc(var(--sat) + 12px);
+  right: calc(var(--sar) + 12px);
+  display: flex;
+  gap: 8px;
+  z-index: 30;
+}
+
+/* ═══════════════════════════════
+   INFÓ SAROK
+   Csak a lobbiban él, a bal alsó sarokban. A játék- és
+   végképernyőn a sarkok foglaltak, ott nem villog bele.
+═══════════════════════════════ */
+.info-corner {
+  position: fixed;
+  left: calc(var(--sal) + 12px);
+  bottom: calc(var(--sab) + 12px);
+  z-index: 40;
+}
+
+.info-btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-faint);
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: .5;
+  transition: opacity .2s, transform .14s var(--spring), color .2s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .info-btn:hover { opacity: 1; color: var(--text-dim); }
+}
+.info-btn:active { transform: scale(.88); }
+.info-btn[aria-expanded="true"] {
+  opacity: 1;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.info-panel {
+  position: absolute;
+  left: 0;
+  bottom: 44px;
+  width: max-content;
+  max-width: min(78vw, 290px);
+  padding: 14px 16px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-3);
+  animation: infoPop .26s var(--spring);
+  transform-origin: 12px 100%;
+}
+.info-panel[hidden] { display: none; }
+@keyframes infoPop {
+  from { opacity: 0; transform: scale(.86) translateY(8px); }
+}
+
+/* nyílhegy a gomb felé */
+.info-panel::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  background: var(--card-bg);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.info-thanks {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.info-handle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  margin: 3px 0 9px;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .14s var(--spring);
+}
+.info-handle:active { transform: scale(.97); }
+
+.info-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1.1;
+  color: var(--accent);
+  /* ha a vágólap nem elérhető, kijelöléssel is másolható legyen */
+  -webkit-user-select: text;
+  user-select: text;
+}
+.info-name::before { content: '@'; opacity: .45; }
+
+/* látható súgó: mobilon nincs tooltip, ki kell írni */
+.info-copy {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--text-faint);
+  transition: color .2s;
+}
+.info-handle.is-copied .info-name { color: var(--accent-3d); }
+.info-handle.is-copied .info-copy { color: var(--accent-3d); }
+
+.info-note {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-dim);
+  border-top: 1px solid var(--line-soft);
+  padding-top: 9px;
+}
+.info-note b { color: var(--text); font-weight: 600; }
+
+/* ═══════════════════════════════
+   GAME — sose lóghat ki a képernyőből
+   Rács, ahol egyedül a kártya-zóna nyúlik;
+   minden más a saját magasságát tartja.
+═══════════════════════════════ */
+#game-screen.active {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 8px;
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  padding-block: calc(var(--sat) + 10px) calc(var(--sab) + 12px);
+
+  /* Kötött magasság, nem csak minimum: így az 1fr-es kártyasor a
+     tényleges maradékból számol. min-height mellett a rács egyszerűen
+     túlnőtt a képernyőn, amint felkerült pár cetli. Az overflow-auto
+     csak biztonsági szelep nagyon alacsony kijelzőre. */
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  /* felülírja a .screen.active flex-beállítását: rácsban az
+     align-items:center összehúzná a kártya-zónát a tartalmához,
+     így a lap sosem használná ki a szabad magasságot */
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+/* Kifejezett sorok: a cetli-sáv üresen kiesik a rácsból,
+   és automatikus elhelyezéssel elcsúszna minden alatta. */
+#game-screen .topbar      { grid-row: 1; }
+#game-screen .notes-strip { grid-row: 2; }
+#game-screen .turn-area   { grid-row: 3; }
+#game-screen .card-zone   { grid-row: 4; }
+#game-screen .bottom      { grid-row: 5; }
+
+/* ── felső sáv ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.brand {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+@media (max-width: 420px) {
+  .brand { display: none; }
+}
+
+/* ── aktuális játékos ── */
+.turn-area {
+  text-align: center;
+  line-height: 1;
+}
+.turn-label {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 3px;
+}
+.turn-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(30px, 7.5vw, 52px);
+  line-height: 1.05;
+  color: var(--turn-color, var(--accent-2d));
+  overflow-wrap: anywhere;
+}
+.turn-name.is-changing { animation: turnIn .4s var(--spring); }
+
+@media (max-height: 780px) {
+  .turn-name { font-size: clamp(26px, 6.5vw, 40px); }
+  .turn-label { font-size: 11px; }
+  #game-screen.active { gap: 6px; }
+}
+@keyframes turnIn {
+  from { opacity: 0; transform: translateY(-8px) scale(.94); }
+}
+
+/* ═══════════════════════════════
+   KÁRTYA
+═══════════════════════════════ */
+.card-zone {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 6px 0;
+}
+
+/* A szélességet JS méri (ResizeObserver), hogy a lap
+   soha ne lógjon ki sem magasságban, sem szélességben. */
+.card-slot {
+  position: relative;
+  width: var(--card-w, 240px);
+  aspect-ratio: 5 / 7;
+  container-type: inline-size;
+}
+
+/* ── pakli: fizikai kupac, ami látványosan fogy ── */
+.deck-stack {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.deck-stack i {
+  position: absolute;
+  inset: 0;
+  border-radius: 6cqw;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px var(--card-shadow-color);
+  opacity: 0;
+  transition: opacity .45s var(--ease), transform .45s var(--spring);
+}
+.deck-stack i:nth-child(1) { transform: translate(3px, 3px)   rotate(1.1deg); }
+.deck-stack i:nth-child(2) { transform: translate(6px, 6px)   rotate(2.2deg); }
+.deck-stack i:nth-child(3) { transform: translate(9px, 9px)   rotate(3.3deg); }
+.deck-stack i:nth-child(4) { transform: translate(12px, 12px) rotate(4.4deg); }
+
+.deck-stack[data-layers="1"] i:nth-child(-n + 1),
+.deck-stack[data-layers="2"] i:nth-child(-n + 2),
+.deck-stack[data-layers="3"] i:nth-child(-n + 3),
+.deck-stack[data-layers="4"] i:nth-child(-n + 4) { opacity: 1; }
+
+.card-wrap {
+  position: absolute;
+  inset: 0;
+  perspective: 1200px;
+  cursor: pointer;
+}
+.card-wrap.no-click { cursor: default; }
+.card-wrap.is-dealing { animation: deal .42s var(--spring); }
+@keyframes deal {
+  from { transform: translate(14px, 16px) rotate(5deg) scale(.97); opacity: .3; }
+}
+
+.card-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform var(--flip-dur) var(--ease);
+}
+.card-inner.flipped { transform: rotateY(180deg); }
+
+/* a lap alatti árnyék külön elem, hogy a fordulással
+   együtt tudjon lapulni — ettől lesz „súlya" a lapnak */
+.card-shadow {
+  position: absolute;
+  left: 8%; right: 8%;
+  bottom: -14px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--card-shadow-color);
+  filter: blur(10px);
+  opacity: .55;
+  transition: transform var(--flip-dur) var(--ease), opacity var(--flip-dur) var(--ease);
+}
+.card-slot.is-flipping .card-shadow { transform: scaleX(.6); opacity: .82; }
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 6cqw;
+  box-shadow: 0 10px 34px var(--card-shadow-color), 0 2px 8px var(--card-shadow-color);
+  overflow: hidden;
+}
+
+/* ── HÁTLAP — klasszikus rombuszmintás kártyahát ── */
+.card-back {
+  display: grid;
+  place-items: center;
+  background-color: var(--accent);
+  background-image:
+    repeating-linear-gradient( 45deg, rgba(255,255,255,.08) 0 6px, transparent 6px 13px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.08) 0 6px, transparent 6px 13px);
+  border: 4px solid color-mix(in srgb, #fff 26%, transparent);
+}
+.card-back::before {
+  content: '';
+  position: absolute;
+  inset: 5.5cqw;
+  border: 1.5px solid rgba(255,255,255,.28);
+  border-radius: 3cqw;
+}
+.card-back::after {
+  content: '';
+  position: absolute;
+  inset: 7cqw;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 2.4cqw;
+}
+.back-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3cqw;
+  text-align: center;
+  padding: 4cqw;
+}
+.back-medallion {
+  width: 30cqw; height: 30cqw;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(255,255,255,.3);
+  font-size: 15cqw;
+  line-height: 1;
+}
+.back-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 8cqw;
+  color: rgba(255,255,255,.94);
+}
+.back-hint {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 4cqw;
+  color: rgba(255,255,255,.6);
+}
+.card-wrap:not(.no-click) .back-medallion { animation: breathe 2.8s ease-in-out infinite; }
+@keyframes breathe {
+  50% { transform: scale(1.06); }
+}
+
+/* ── ELŐLAP ──
+   A keret, a tinta és a jelvény a kategória színét veszi fel,
+   így egy „Párbaj" ránézésre más, mint egy „Kacsamester".
+─────────────────────────────── */
+.card-front {
+  transform: rotateY(180deg);
+  background: var(--card-bg);
+  border: 4px solid var(--cat, var(--accent-2));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 4.5cqw;
+  gap: 1cqw;
+}
+.card-front::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(85% 60% at 50% 8%, color-mix(in srgb, var(--cat, var(--accent-2)) 12%, transparent), transparent 70%);
+}
+
+.card-head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5cqw;
+  /* ha a jelvény mégsem férne a lapérték mellé, essen alá,
+     ne vágódjon le a lap széléről */
+  flex-wrap: wrap;
+  row-gap: 1.5cqw;
+}
+.card-sv {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 900;
+  font-size: max(15px, 9.5cqw);
+  line-height: 1;
+}
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2cqw;
+  padding: 1.2cqw 2.2cqw;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat, var(--accent-2)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat, var(--accent-2)) 40%, transparent);
+  color: var(--cat, var(--accent-2));
+  font-family: 'DM Mono', ui-monospace, monospace;
+  /* kis lapon a 3.3cqw ~8 px lenne — olvashatatlan, ezért van alsó korlát */
+  font-size: max(9.5px, 3.3cqw);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* --fit: a JS ezzel kicsinyíti a szöveget, amíg befér.
+   Egyetlen változó skálázza a nevet és a leírást együtt. */
+.card-body {
+  --fit: 1;
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* stretch, NEM center: középre igazítva a sorok a saját
+     max-content szélességükre nyúlnának, és egy hosszú név
+     (Hüvelykmester, Kérdésmester) túllógna a lapon — a
+     méretezés pedig azt hinné, hogy kényelmesen elfér. */
+  align-items: stretch;
+  justify-content: center;
+  gap: 2.5cqw;
+  overflow: hidden;
+}
+.card-rule {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: calc(var(--fit) * 16.5cqw);
+  line-height: 1.08;
+  text-align: center;
+  color: var(--cat, var(--accent-2));
+  /* sosem törhet szó közepén — inkább kisebb betű */
+  overflow-wrap: normal;
+  hyphens: none;
+}
+.card-desc {
+  font-family: 'Inter', system-ui, sans-serif;
+  /* A leírást kell elolvasni, a név csak dísz — ezért a kicsinyítés
+     csak 60%-ban üti meg a leírást. (A skála így is monoton csökkenő,
+     szóval a magasságkereső ugyanúgy konvergál.) */
+  font-size: calc((0.4 + 0.6 * var(--fit)) * 7cqw);
+  line-height: 1.42;
+  text-align: center;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+
+.suit-h, .suit-d { color: var(--cat-duel); }
+.suit-s, .suit-c { color: var(--text); }
+
+/* király: aranyló, ünnepi lap */
+.card-front.is-king {
+  border-width: 5px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cat-king) 45%, transparent);
+}
+.card-front.is-king::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent 38%, color-mix(in srgb, var(--cat-king) 22%, transparent) 50%, transparent 62%);
+}
+
+/* ═══════════════════════════════
+   ALSÓ SÁV
+═══════════════════════════════ */
+.bottom {
+  width: 100%;
+  max-width: 460px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.rule-ctrl {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 16px;
+  border: 2px dashed var(--accent-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  cursor: pointer;
+  animation: rowIn .25s var(--spring);
+}
+.rule-ctrl:focus { border-style: solid; border-color: var(--accent-3d); }
+.rule-ctrl.hidden { display: none; }
+
+/* ── társválasztó ──
+   Natív <select> helyett arcok: a legördülő popupját a böngésző
+   festi, sötét témában olvashatatlan volt — és két koppintás. */
+.rule-pick {
+  width: 100%;
+  padding: 8px 10px 10px;
+  border: 2px dashed var(--accent-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  animation: rowIn .25s var(--spring);
+}
+.rule-pick.hidden { display: none; }
+
+.rule-pick-label {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 7px;
+}
+.rule-pick-row {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+.rule-pick-row::-webkit-scrollbar { display: none; }
+
+.pick {
+  flex-shrink: 0;
+  min-width: 62px;
+  min-height: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 7px 8px;
+  border: 2px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform .14s var(--spring), border-color .18s, background .18s;
+}
+.pick-face { font-size: 22px; line-height: 1; }
+.pick-name {
+  max-width: 66px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pick:hover { border-color: var(--who, var(--accent-2)); background: var(--surface-2); }
+}
+.pick:active { transform: scale(.93); }
+.pick.is-picked {
+  border-color: var(--who, var(--accent-2));
+  background: color-mix(in srgb, var(--who, var(--accent-2)) 20%, transparent);
+}
+.pick.is-picked .pick-name { color: var(--text); font-weight: 600; }
+
+/* ═══════════════════════════════
+   END — leleplezés, kitüntetések, mérleg
+
+   Az egész képernyő ütemezve épül fel (animation-delay),
+   mint egy eredményhirdetés: előbb a szemvillanás, aztán
+   a név, a verdikt, végül a számok.
+═══════════════════════════════ */
+#end-screen.active {
+  justify-content: flex-start;
+  gap: 16px;
+  overflow-y: auto;
+}
+#end-screen > * {
+  width: 100%;
+  max-width: 460px;
+  flex-shrink: 0;
+}
+
+.end-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.end-eyebrow {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  animation: endFade .4s var(--ease) both;
+}
+
+/* ── hős: az avatar és a kicsorduló pohár ── */
+.end-hero {
+  position: relative;
+  width: clamp(128px, 34vw, 168px);
+  height: clamp(128px, 34vw, 168px);
+  display: grid;
+  place-items: center;
+  margin: 4px 0 2px;
+}
+
+/* reflektor */
+.end-spot {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--who, var(--accent-2)) 34%, transparent) 0%, transparent 68%);
+  animation: endSpot .7s var(--ease) both;
+}
+@keyframes endSpot {
+  from { opacity: 0; transform: scale(.4); }
+}
+
+.end-face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: clamp(58px, 16vw, 78px);
+  line-height: 1;
+  background: color-mix(in srgb, var(--who, var(--accent-2)) 18%, var(--surface-2));
+  border: 3px solid var(--who, var(--accent-2));
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--who, var(--accent-2)) 14%, transparent), var(--shadow-2);
+  animation: endDrop .62s var(--spring) .12s both;
+}
+@keyframes endDrop {
+  from { opacity: 0; transform: translateY(-34px) scale(.55) rotate(-14deg); }
+}
+
+/* a pohár úgy ül a vállán, mint akit épp most ítéltek el */
+.end-cup {
+  position: absolute;
+  right: -6%;
+  bottom: -4%;
+  width: 42%;
+  height: auto;
+  filter: drop-shadow(0 4px 10px var(--card-shadow-color));
+  animation: endDrop .5s var(--spring) .5s both;
+}
+.end-cup .cup-glass {
+  fill: none;
+  stroke: color-mix(in srgb, var(--text) 60%, transparent);
+  stroke-width: 4.5;
+  stroke-linejoin: round;
+}
+.end-cup .cup-liquid { fill: var(--cat-king); }
+.end-cup .cup-foam   { fill: color-mix(in srgb, var(--cat-king) 32%, #fff); }
+/* a perem fölé púposodó hab — ettől látszik, hogy túltöltötték */
+.end-cup .cup-spill {
+  fill: color-mix(in srgb, var(--cat-king) 26%, #fff);
+  stroke: color-mix(in srgb, var(--text) 34%, transparent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* kicsorduló cseppek a pohár két oldalán */
+.end-drops ellipse {
+  fill: var(--cat-king);
+  animation: spill 2.1s ease-in infinite;
+}
+.end-drops ellipse:nth-child(2) { animation-delay: .7s; }
+.end-drops ellipse:nth-child(3) { animation-delay: 1.4s; }
+@keyframes spill {
+  0%   { opacity: 0; translate: 0 0; }
+  15%  { opacity: 1; }
+  72%  { opacity: 1; translate: 0 36px; }
+  100% { opacity: 0; translate: 0 54px; }
+}
+
+.end-stage.is-deckout .end-cup { display: none; }
+
+.end-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(38px, 11vw, 62px);
+  line-height: 1.04;
+  color: var(--who, var(--accent));
+  overflow-wrap: anywhere;
+  animation: endDrop .5s var(--spring) .34s both;
+}
+
+.end-verdict {
+  max-width: 380px;
+  font-size: clamp(15px, 4vw, 19px);
+  line-height: 1.45;
+  color: var(--text-dim);
+  animation: endFade .45s var(--ease) .55s both;
+}
+.end-verdict b { color: var(--text); font-weight: 600; }
+
+@keyframes endFade {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+/* ═══════════════════════════════
+   SZERENCSEKERÉK
+   Hat egyforma cikk: négy „plusz ital", két „megúszod",
+   egymással szemben — az esély ránézésre leolvasható.
+═══════════════════════════════ */
+.end-wheel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  animation: endFade .45s var(--ease) .7s both;
+}
+.end-wheel[hidden] { display: none; }
+
+.wheel-intro {
+  font-size: 13.5px;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--text-dim);
+  max-width: 330px;
+}
+.wheel-intro b { color: var(--text); font-weight: 600; }
+.wheel-intro[hidden] { display: none; }
+
+.wheel-stage {
+  /* a cikkjelek sugara — px-ben, mert a % a jel saját méretéhez mérne */
+  --wheel-r: min(18vw, 60px);
+  position: relative;
+  width: min(58vw, 196px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.wheel-disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 4px solid var(--card-bg);
+  box-shadow: var(--shadow-2), 0 0 0 2px var(--line);
+  background:
+    repeating-conic-gradient(from 0deg,
+      rgba(0, 0, 0, .22) 0deg 1.2deg, transparent 1.2deg 60deg),
+    conic-gradient(from 0deg,
+      var(--cat-duel)  0deg  60deg,
+      var(--cat-rule) 60deg 120deg,
+      var(--cat-duel) 120deg 240deg,
+      var(--cat-rule) 240deg 300deg,
+      var(--cat-duel) 300deg 360deg);
+  transition: transform 3.4s cubic-bezier(.14, .86, .18, 1);
+}
+/* a cikkjelek a saját sugarukon ülnek, és a kerékkel forognak */
+.wheel-disc span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: min(6vw, 21px);
+  line-height: 1;
+  transform: translate(-50%, -50%) rotate(var(--a)) translateY(calc(-1 * var(--wheel-r)));
+  transform-origin: center;
+}
+
+.wheel-hub {
+  position: relative;
+  z-index: 2;
+  width: 30%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 2px solid var(--line);
+  font-size: min(5.5vw, 19px);
+  box-shadow: var(--shadow-1);
+}
+
+/* mutató: a kerék tetejébe lógó ék */
+.wheel-pointer {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 18px solid var(--text);
+  filter: drop-shadow(0 2px 3px var(--card-shadow-color));
+}
+
+.wheel-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+}
+.wheel-actions[hidden] { display: none; }
+.wheel-actions .btn { width: 100%; }
+.wheel-actions .btn-ghost {
+  border-style: solid;
+  border-color: var(--line);
+  color: var(--text-dim);
+  font-size: 15px;
+  min-height: 44px;
+}
+
+.wheel-result {
+  font-size: clamp(15px, 4.2vw, 18px);
+  line-height: 1.4;
+  text-align: center;
+  animation: endDrop .5s var(--spring) both;
+}
+.wheel-result[hidden] { display: none; }
+
+#drink-btn {
+  width: 100%;
+  max-width: 320px;
+  animation: endDrop .45s var(--spring) .25s both;
+}
+#drink-btn[hidden] { display: none; }
+.wheel-result b { font-weight: 700; }
+.wheel-result.is-escape  { color: var(--cat-rule); }
+.wheel-result.is-extra   { color: var(--cat-duel); }
+.wheel-result.is-declined { color: var(--text-dim); }
+
+/* megúszta — a pohár lekerül róla */
+.end-stage.is-saved .end-cup { opacity: .25; filter: grayscale(1); }
+
+/* ── kitüntetések ── */
+.end-awards {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.end-awards[hidden] { display: none; }
+
+.award {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 13px;
+  border-radius: var(--r-md);
+  border: 1px solid color-mix(in srgb, var(--who, var(--accent-2)) 34%, transparent);
+  background: color-mix(in srgb, var(--who, var(--accent-2)) 11%, transparent);
+  text-align: left;
+  animation: awardIn .45s var(--spring) both;
+}
+@keyframes awardIn {
+  from { opacity: 0; transform: translateX(-14px); }
+}
+.award-medal {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--who, var(--accent-2)) 22%, var(--surface-2));
+  font-size: 17px;
+  line-height: 1;
+}
+.award-text { min-width: 0; }
+.award-label {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--who, var(--accent-2));
+}
+.award-who {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+.award-note { color: var(--text-faint); }
+
+/* ── mérleg ── */
+.end-panel {
+  padding: 12px 14px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  animation: endFade .5s var(--ease) 1.2s both;
+}
+.end-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.end-summary b { color: var(--text); font-weight: 500; font-size: 14px; }
+
+.end-table { display: flex; flex-direction: column; gap: 4px; }
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 24px minmax(58px, 1fr) minmax(40px, 1.1fr) 26px auto;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px;
+  border-radius: 8px;
+}
+.stat-row.is-loser {
+  background: color-mix(in srgb, var(--who, var(--accent)) 15%, transparent);
+  box-shadow: inset 2px 0 0 var(--who, var(--accent));
+}
+.stat-face { font-size: 17px; line-height: 1; }
+.stat-name {
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stat-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line-soft);
+  overflow: hidden;
+}
+.stat-bar i {
+  display: block;
+  height: 100%;
+  background: var(--who, var(--accent-2));
+  transform-origin: left center;
+  animation: barGrow .7s var(--ease) 1.35s both;
+}
+/* a záró érték a soron beállított inline transform marad */
+@keyframes barGrow { from { transform: scaleX(0); } }
+.stat-num {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  text-align: right;
+}
+.stat-kings { font-size: 10px; letter-spacing: -2px; white-space: nowrap; }
+
+/* ── gombok ── */
+.end-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: auto;
+  padding-top: 2px;
+  animation: endFade .5s var(--ease) 1.35s both;
+}
+.end-actions[hidden] { display: none; }
+.end-actions .btn { width: 100%; }
+
+/* alacsony kijelzőn (fekvő telefon) húzzuk össze a leleplezést,
+   hogy a kitüntetések is beférjenek a képbe */
+@media (max-height: 620px) {
+  #end-screen.active { gap: 11px; }
+  .end-hero { width: 104px; height: 104px; margin: 0; }
+  .end-face { font-size: 46px; border-width: 2px; }
+  .end-name { font-size: clamp(30px, 8vw, 42px); }
+  .end-verdict { font-size: 14px; }
+  .end-eyebrow { font-size: 11px; }
+  .end-stage { gap: 5px; }
+}
+
+/* ═══════════════════════════════
+   FEKVŐ MÓD / ALACSONY KÉPERNYŐ
+   Két hasáb: bal oldalon a lap, jobbon minden más.
+═══════════════════════════════ */
+@media (orientation: landscape) and (max-height: 560px) {
+  #game-screen.active {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    column-gap: 18px;
+    max-width: 900px;
+  }
+  #game-screen .topbar      { grid-column: 1 / -1; grid-row: 1; }
+  #game-screen .card-zone   { grid-column: 1; grid-row: 2 / 5; }
+  #game-screen .notes-strip { grid-column: 2; grid-row: 2; max-width: none; }
+  #game-screen .turn-area   { grid-column: 2; grid-row: 3; align-self: end; }
+  #game-screen .bottom      { grid-column: 2; grid-row: 4; align-self: start; }
+
+  .turn-name { font-size: clamp(26px, 5.5vh, 40px); }
+  /* fekvőben a zsetonsor redundáns: a soron lévő játékos neve
+     amúgy is ott van nagyban közvetlenül fölötte */
+  #game-screen .chips { display: none; }
+
+  #setup-screen.active { gap: 14px; }
+  .setup-title { font-size: clamp(34px, 9vh, 54px); }
+}

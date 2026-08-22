@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="King's Cup">
+  <!-- A rajz a középső ~66%-ban van, hogy maskable ikonként se vágja le
+       az Android körkörös/lekerekített maszkja. -->
+  <rect width="512" height="512" fill="#c75146"/>
+  <g opacity=".1" fill="none" stroke="#fff" stroke-width="9">
+    <path d="M-40 120 L560 -480 M-40 240 L560 -360 M-40 360 L560 -240 M-40 480 L560 -120
+             M-40 600 L560 0 M-40 720 L560 120 M-40 840 L560 240"/>
+    <path d="M-40 -120 L560 480 M-40 -240 L560 360 M-40 0 L560 600 M-40 120 L560 720
+             M-40 240 L560 840 M-40 -360 L560 240 M-40 360 L560 960"/>
+  </g>
+
+  <circle cx="256" cy="256" r="150" fill="#f4ead5"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#f4a261" stroke-width="10"/>
+
+  <!-- korona -->
+  <path d="M170 300 L156 196 L206 236 L256 172 L306 236 L356 196 L342 300 Z"
+        fill="#d4a017" stroke="#2b2018" stroke-width="9" stroke-linejoin="round"/>
+  <rect x="170" y="300" width="172" height="34" rx="9"
+        fill="#d4a017" stroke="#2b2018" stroke-width="9"/>
+  <circle cx="256" cy="160" r="15" fill="#c75146" stroke="#2b2018" stroke-width="8"/>
+</svg>

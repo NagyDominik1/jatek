@@ -1,0 +1,151 @@
+/* ═══════════════════════════════════════════════
+   BASE — reset, body, háttér, képernyők
+═══════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  /* iOS: ne ugráljon a layout, ha a címsáv be/kicsúszik */
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  min-height: 100vh;          /* fallback */
+  min-height: 100dvh;         /* a valódi látható magasság mobilon */
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+
+  /* mobil higiénia: nincs kék tap-villanás, nincs dupla-tap zoom,
+     és nem jelöli ki a szöveget, ha gyorsan nyomkodják a lapot */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* beviteli mezőkben viszont kell a kijelölés */
+input, select, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* meleg fénygóc a háttérben — mélységet ad a lapos alapszínnek */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 0%, var(--bg-glow) 0%, transparent 62%);
+}
+
+/* ── szemcse ──
+   Kisebb csempe + saját kompozitor-réteg, hogy mobilon
+   ne kelljen minden képkockán újrarajzolni. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: var(--noise-opacity);
+  mix-blend-mode: var(--noise-blend);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  transform: translateZ(0);
+  contain: strict;
+}
+
+/* ── sarok-dekor ──
+   A biztonságos zónán belülre húzva, hogy notch/home
+   indikátor alá ne csússzon. Kis képernyőn elrejtjük,
+   mert ott minden pixel a játéké. */
+.deco {
+  position: fixed;
+  font-size: clamp(26px, 5vw, 38px);
+  opacity: .1;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+.deco-tl { top: calc(var(--sat) + 14px); left:  calc(var(--sal) + 14px); }
+.deco-tr { top: calc(var(--sat) + 14px); right: calc(var(--sar) + 14px); }
+.deco-bl { bottom: calc(var(--sab) + 14px); left:  calc(var(--sal) + 14px); }
+.deco-br { bottom: calc(var(--sab) + 14px); right: calc(var(--sar) + 14px); }
+
+@media (max-width: 720px) {
+  .deco { display: none; }
+}
+
+/* ── képernyők ── */
+.screen {
+  display: none;
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding:
+    calc(var(--sat) + 18px)
+    calc(var(--sar) + 18px)
+    calc(var(--sab) + 18px)
+    calc(var(--sal) + 18px);
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.screen-enter { animation: screenIn .38s var(--ease); }
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
+/* ── tipográfia ── */
+.display {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1.04;
+}
+.mono {
+  font-family: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+.eyebrow {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ── fókusz ── */
+:focus-visible {
+  outline: 3px solid var(--accent-2);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── mozgáscsökkentés ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

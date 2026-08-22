@@ -2,444 +2,30 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- viewport-fit=cover: a notch mögé is fest, a biztonságos zónát CSS-ben kezeljük -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="King's Cup — kacsás-nyuszis ivós kártyajáték. Telepíthető, offline is működik.">
+<meta name="theme-color" content="#f4ead5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="King's Cup">
 <title>King's Cup 🦆</title>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./assets/icon.svg">
+
+<!-- mindkét fonthoszthoz kell preconnect: a gstatic nélkül egy plusz
+     kapcsolatfelépítés csúszik a szövegek megjelenése elé mobilneten -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,700;1,9..144,900&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --cream: #f4ead5;
-  --peach: #f4a261;
-  --sage:  #87a878;
-  --rust:  #c75146;
-  --ink:   #2b2018;
-  --peach-d: #d4834a;
-  --sage-d:  #6a8a5e;
-  --rust-d:  #a83e34;
-}
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,700;1,9..144,900&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap">
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--cream);
-  color: var(--ink);
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ── noise texture ── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: .045;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-}
-
-/* ── corner deco ── */
-.deco { position: fixed; font-size: 36px; opacity: .12; pointer-events: none; z-index: 1; }
-.deco-tl { top: 16px; left: 16px; }
-.deco-tr { top: 16px; right: 16px; }
-.deco-bl { bottom: 16px; left: 16px; }
-.deco-br { bottom: 16px; right: 16px; }
-
-/* ── screens ── */
-.screen { display: none; min-height: 100vh; position: relative; z-index: 2; }
-.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; gap: 28px; }
-
-/* ═══════════════════════════════════
-   SETUP SCREEN
-═══════════════════════════════════ */
-.setup-title {
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 900;
-  font-size: clamp(56px, 10vw, 88px);
-  color: var(--rust);
-  text-align: center;
-  line-height: 1.05;
-  text-shadow: 4px 4px 0 rgba(43,32,24,.08);
-}
-
-.setup-sub {
-  font-family: 'DM Mono', monospace;
-  font-size: 18px;
-  color: var(--ink);
-  opacity: .55;
-  text-align: center;
-}
-
-.players-wrap {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.player-row {
-  display: flex;
-  gap: 10px;
-  animation: fadeSlide .25s ease;
-}
-@keyframes fadeSlide {
-  from { opacity: 0; transform: translateX(-16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-.player-input {
-  flex: 1;
-  padding: 13px 18px;
-  border: 2px solid var(--peach);
-  border-radius: 12px;
-  background: rgba(255,255,255,.65);
-  font-family: 'Inter', sans-serif;
-  font-size: 18px;
-  color: var(--ink);
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
-.player-input:focus {
-  border-color: var(--rust);
-  box-shadow: 0 0 0 3px rgba(199,81,70,.15);
-}
-
-.rm-btn {
-  width: 48px; height: 48px;
-  border: none; border-radius: 12px;
-  background: var(--rust); color: #fff;
-  font-size: 18px; cursor: pointer;
-  transition: background .15s, transform .1s;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.rm-btn:hover { background: var(--rust-d); transform: scale(1.06); }
-
-.add-btn {
-  width: 100%; max-width: 480px;
-  padding: 13px 20px;
-  border: 2px dashed var(--sage);
-  border-radius: 12px;
-  background: transparent;
-  color: var(--sage-d);
-  font-family: 'Inter', sans-serif;
-  font-size: 18px; font-weight: 600;
-  cursor: pointer;
-  transition: background .2s, border-color .2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.add-btn:hover { background: rgba(135,168,120,.12); border-color: var(--sage-d); }
-
-.start-btn {
-  padding: 18px 64px;
-  background: var(--rust); color: #fff;
-  border: none; border-radius: 16px;
-  font-family: 'Fraunces', serif; font-style: italic;
-  font-size: 30px; font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 5px 0 var(--rust-d);
-  transition: transform .15s, box-shadow .15s;
-}
-.start-btn:hover  { transform: translateY(-2px); box-shadow: 0 7px 0 var(--rust-d); }
-.start-btn:active { transform: translateY(3px);  box-shadow: 0 2px 0 var(--rust-d); }
-.start-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: 0 5px 0 var(--rust-d); }
-
-.err { color: var(--rust); font-family: 'DM Mono', monospace; font-size: 16px; text-align: center; min-height: 22px; }
-
-/* ═══════════════════════════════════
-   GAME SCREEN
-═══════════════════════════════════ */
-#game-screen.active {
-  justify-content: space-between;
-  padding: 16px 20px 24px;
-  gap: 12px;
-}
-
-/* stats bar */
-.stats-bar {
-  width: 100%; max-width: 680px;
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 20px;
-  background: rgba(255,255,255,.5);
-  border: 2px solid rgba(244,162,97,.3);
-  border-radius: 14px;
-  backdrop-filter: blur(4px);
-}
-.stat {
-  display: flex; align-items: center; gap: 7px;
-  font-family: 'DM Mono', monospace;
-  font-size: 18px; font-weight: 500;
-}
-.stat-kings { color: var(--rust); }
-.stat-logo  { color: var(--ink); opacity: .5; font-size: 16px; }
-.stat-deck  { color: var(--sage-d); }
-
-/* ── active effects: falra tűzött cetlik ── */
-.effects {
-  width: 100%; max-width: 680px;
-  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-}
-.effects:empty { display: none; }
-
-/* nagy képernyőn kiül a jobb felső sarokba, mobilon marad a folyamban */
-@media (min-width: 860px) {
-  .effects {
-    position: fixed;
-    top: 92px; right: 26px;
-    width: auto; max-width: 200px;
-    flex-direction: column; align-items: flex-end;
-    z-index: 40;
-  }
-}
-
-.note {
-  position: relative;
-  min-width: 140px; max-width: 190px;
-  padding: 14px 16px 11px;
-  background: #fffdf4;
-  border: 1px solid rgba(43,32,24,.07);
-  border-radius: 3px;
-  box-shadow: 2px 5px 14px rgba(43,32,24,.15);
-  text-align: center;
-  animation: notePop .32s cubic-bezier(.34,1.56,.64,1);
-}
-/* ragasztószalag */
-.note::before {
-  content: '';
-  position: absolute;
-  top: -8px; left: 50%;
-  width: 56px; height: 17px;
-  transform: translateX(-50%) rotate(-2.5deg);
-  background: rgba(244,162,97,.4);
-  border-left: 1px dashed rgba(255,255,255,.55);
-  border-right: 1px dashed rgba(255,255,255,.55);
-}
-.note-a { transform: rotate(-2.2deg); }
-.note-b { transform: rotate(1.6deg); }
-.note-b::before { background: rgba(135,168,120,.4); }
-.note-edit { cursor: pointer; }
-.note-a.note-edit:hover { transform: rotate(-2.2deg) translateY(-3px); }
-.note-b.note-edit:hover { transform: rotate(1.6deg)  translateY(-3px); }
-
-.note-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px; letter-spacing: .13em; text-transform: uppercase;
-  color: var(--ink); opacity: .45;
-  margin-top: 3px;
-}
-.note-word {
-  font-family: 'Fraunces', serif; font-style: italic; font-weight: 900;
-  font-size: 25px; line-height: 1.12;
-  color: var(--rust);
-  margin: 3px 0 4px;
-  overflow-wrap: anywhere;
-}
-.note-b .note-word { color: var(--sage-d); }
-.note-x { font-style: normal; opacity: .38; }
-.note-by {
-  font-family: 'Inter', sans-serif; font-size: 11px;
-  color: var(--ink); opacity: .42;
-}
-
-@keyframes notePop {
-  from { opacity: 0; transform: scale(.85) rotate(-7deg); }
-}
-
-/* tartós szabály beállítója (szó vagy társ) */
-.rule-ctrl {
-  width: 100%;
-  padding: 11px 16px;
-  border: 2px dashed var(--sage);
-  border-radius: 12px;
-  background: rgba(255,255,255,.65);
-  font-family: 'DM Mono', monospace;
-  font-size: 17px;
-  color: var(--ink);
-  text-align: center;
-  outline: none;
-  cursor: pointer;
-  animation: fadeSlide .25s ease;
-}
-.rule-ctrl:focus { border-style: solid; border-color: var(--sage-d); }
-.rule-ctrl.hidden { display: none; }
-
-/* current player */
-.turn-area { text-align: center; }
-.turn-label {
-  font-family: 'DM Mono', monospace;
-  font-size: 18px; color: var(--ink); opacity: .5;
-  margin-bottom: 4px;
-}
-.turn-name {
-  font-family: 'Fraunces', serif; font-style: italic; font-weight: 900;
-  font-size: clamp(36px, 7vw, 56px);
-  color: var(--peach-d);
-  line-height: 1;
-}
-
-/* card zone */
-.card-zone {
-  flex: 1;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 0;
-}
-
-.card-wrap {
-  width: clamp(230px, 40vw, 300px);
-  perspective: 1100px;
-  cursor: pointer;
-}
-.card-wrap.no-click { cursor: default; }
-
-.card-inner {
-  width: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform .65s cubic-bezier(.4,0,.2,1);
-}
-.card-inner.flipped { transform: rotateY(180deg); }
-
-.card-face {
-  position: absolute; inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 22px;
-  box-shadow: 0 10px 40px rgba(43,32,24,.18), 0 2px 8px rgba(43,32,24,.1);
-  display: flex; align-items: center; justify-content: center; flex-direction: column;
-}
-
-/* BACK */
-.card-back {
-  background: var(--rust);
-  border: 4px solid rgba(255,255,255,.25);
-}
-.back-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.back-big   { font-size: clamp(64px, 12vw, 90px); line-height: 1; }
-.back-title {
-  font-family: 'Fraunces', serif; font-style: italic; font-weight: 700;
-  font-size: 26px; color: rgba(255,255,255,.9);
-}
-.back-hint  {
-  font-family: 'DM Mono', monospace; font-size: 14px;
-  color: rgba(255,255,255,.55); margin-top: 6px;
-}
-
-/* FRONT — ez adja a lap magasságát: sosem kisebb a kártyaméretnél,
-   de ha egy szabály szövege hosszabb, inkább megnő, mint hogy levágja */
-.card-front {
-  position: relative;
-  min-height: clamp(330px, 57vw, 430px);
-  transform: rotateY(180deg);
-  background: #fff;
-  border: 4px solid var(--peach);
-  padding: 22px 20px;
-  gap: 0;
-  justify-content: flex-start;
-}
-.card-sv {
-  font-family: 'Fraunces', serif; font-weight: 900;
-  font-size: clamp(44px, 8vw, 64px);
-  line-height: 1;
-  align-self: flex-start;
-}
-.card-rule {
-  flex: 1;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Fraunces', serif; font-style: italic; font-weight: 900;
-  font-size: clamp(36px, 7vw, 52px);
-  text-align: center; line-height: 1.1;
-  padding: 8px 0;
-}
-.card-desc {
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(18px, 3.5vw, 24px);
-  text-align: center; line-height: 1.45;
-  color: var(--ink); opacity: .78;
-  overflow-wrap: anywhere;
-}
-
-/* hosszabb név / leírás → kisebb betű, hogy beférjen a lapra */
-.card-rule.s1 { font-size: clamp(30px, 5.9vw, 44px); }
-.card-rule.s2 { font-size: clamp(26px, 5.1vw, 38px); }
-.card-desc.s1 { font-size: clamp(17px,   3.2vw, 22px); line-height: 1.4; }
-.card-desc.s2 { font-size: clamp(16px,   3vw,   20px); line-height: 1.38; }
-.card-desc.s3 { font-size: clamp(15px,   2.75vw, 18px); line-height: 1.35; }
-.card-desc.s4 { font-size: clamp(14.5px, 2.55vw, 17px); line-height: 1.33; }
-
-.suit-h, .suit-d { color: var(--rust); }
-.suit-s, .suit-c { color: var(--ink); }
-
-/* bottom */
-.bottom {
-  width: 100%; max-width: 440px;
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-}
-
-.chips {
-  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-}
-.chip {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-family: 'DM Mono', monospace; font-size: 16px;
-  background: rgba(255,255,255,.5);
-  border: 2px solid rgba(244,162,97,.3);
-  color: var(--ink);
-  transition: background .25s, border-color .25s, color .25s;
-}
-.chip.active {
-  background: var(--peach); border-color: var(--peach-d);
-  color: #fff; font-weight: 600;
-}
-
-.next-btn {
-  width: 100%;
-  padding: 17px 40px;
-  background: var(--sage); color: #fff;
-  border: none; border-radius: 16px;
-  font-family: 'Fraunces', serif; font-style: italic;
-  font-size: 28px; font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 5px 0 var(--sage-d);
-  transition: transform .15s, box-shadow .15s;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.next-btn:hover  { transform: translateY(-2px); box-shadow: 0 7px 0 var(--sage-d); }
-.next-btn:active { transform: translateY(3px);  box-shadow: 0 2px 0 var(--sage-d); }
-.next-btn:disabled { opacity: .38; cursor: not-allowed; transform: none; box-shadow: 0 5px 0 var(--sage-d); }
-
-/* ═══════════════════════════════════
-   END SCREEN
-═══════════════════════════════════ */
-.end-icon  { font-size: 80px; }
-.end-title {
-  font-family: 'Fraunces', serif; font-style: italic; font-weight: 900;
-  font-size: clamp(48px, 9vw, 72px);
-  color: var(--rust); text-align: center; line-height: 1.1;
-}
-.end-sub {
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(18px, 3.5vw, 24px);
-  color: var(--ink); opacity: .7;
-  text-align: center; max-width: 420px; line-height: 1.45;
-}
-.new-btn {
-  padding: 18px 64px;
-  background: var(--peach); color: #fff;
-  border: none; border-radius: 16px;
-  font-family: 'Fraunces', serif; font-style: italic;
-  font-size: 30px; font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 5px 0 var(--peach-d);
-  transition: transform .15s, box-shadow .15s;
-}
-.new-btn:hover  { transform: translateY(-2px); box-shadow: 0 7px 0 var(--peach-d); }
-.new-btn:active { transform: translateY(3px);  box-shadow: 0 2px 0 var(--peach-d); }
-</style>
+<link rel="stylesheet" href="./assets/css/tokens.css">
+<link rel="stylesheet" href="./assets/css/base.css">
+<link rel="stylesheet" href="./assets/css/components.css">
+<link rel="stylesheet" href="./assets/css/screens.css">
 </head>
 <body>
 
@@ -448,497 +34,253 @@ body::after {
 <div class="deco deco-bl">🐰</div>
 <div class="deco deco-br">🦆</div>
 
-<!-- ╔══════════════════════════════╗
-     ║        SETUP SCREEN         ║
-     ╚══════════════════════════════╝ -->
+<!-- ╔═══════════════════════════════╗
+     ║          SETUP                ║
+     ╚═══════════════════════════════╝ -->
 <div id="setup-screen" class="screen active">
-  <div class="setup-title">King's<br>Cup 👑</div>
-  <div class="setup-sub">🦆 Add meg a játékosok nevét (min. 2) 🐰</div>
+
+  <div class="setup-tools">
+    <button class="icon-btn" type="button" data-action="sound" aria-label="Hang">🔊</button>
+    <button class="icon-btn" type="button" data-action="theme" aria-label="Téma">🌗</button>
+  </div>
+
+  <!-- diszkrét infó a bal alsó sarokban -->
+  <div class="info-corner">
+    <button class="info-btn" type="button" id="info-btn"
+            aria-expanded="false" aria-controls="info-panel" aria-label="Infó">i</button>
+
+    <div class="info-panel" id="info-panel" hidden>
+      <div class="info-thanks">Szívesen tőlem 🦆</div>
+      <button class="info-handle" type="button" id="info-handle">
+        <span class="info-name" id="info-name">n_dom1n1k</span>
+        <span class="info-copy" id="info-copy">📋 bökj rá, kimásolom</span>
+      </button>
+      <p class="info-note">
+        Apró betűs rész: ha lány vagy és ezzel játszol,
+        a bekövetés <b>kötelező</b>. Nem én találtam ki, így van leírva. 🤭
+      </p>
+    </div>
+  </div>
+
+  <div class="setup-head">
+    <!-- kártyalegyező: a lobbi is a játék tárgyáról szóljon, ne egy űrlapról -->
+    <div class="card-fan" aria-hidden="true">
+      <i class="fan-card fan-back">🦆</i>
+      <i class="fan-card fan-face">👑</i>
+      <i class="fan-card fan-back">🐰</i>
+    </div>
+    <h1 class="setup-title">King's<br>Cup</h1>
+    <p class="setup-sub">🦆 Kik ülnek le a paklihoz? 🐰</p>
+  </div>
 
   <div class="players-wrap" id="players-wrap"></div>
 
-  <button class="add-btn" id="add-btn">🐰 &nbsp;+ Játékos hozzáadása&nbsp; 🦆</button>
+  <div class="setup-actions">
+    <button class="btn-ghost" type="button" id="add-btn">🐰 &nbsp;+ Játékos hozzáadása&nbsp; 🦆</button>
 
-  <p class="err" id="err-msg"></p>
+    <!-- élő visszajelzés: az asztal formálódik, ahogy gépelnek -->
+    <p class="table-summary" id="table-summary" aria-live="polite"></p>
 
-  <button class="start-btn" id="start-btn" disabled>🦆 Indítás! 🐰</button>
+    <details class="rules-box">
+      <summary class="rules-summary">Hogy megy ez? 🤔</summary>
+      <ol class="rules-list">
+        <li>Körben mentek, mindenki fordít egy lapot.</li>
+        <li>Minden lapérték egy szabály — <b>minden játékban újrasorsolva</b>, szóval sose ugyanaz a pakli.</li>
+        <li>A <b>tartós szabályok</b> cetlin maradnak a falon, amíg ugyanaz a lap újra elő nem kerül.</li>
+        <li>Királynál mindenki tölt a közös pohárba.</li>
+        <li>Aki a <b>negyedik királyt</b> húzza, megissza az egészet — és vége a menetnek.</li>
+      </ol>
+    </details>
+
+    <p class="err" id="err-msg" role="status" aria-live="polite"></p>
+  </div>
+
+  <!-- az Indítás külön, hogy görgetés közben is odatapadjon az alsó élhez -->
+  <div class="setup-cta">
+    <button class="btn btn-lg" type="button" id="start-btn" disabled>🦆 Indítás! 🐰</button>
+  </div>
+
 </div>
 
-<!-- ╔══════════════════════════════╗
-     ║        GAME SCREEN          ║
-     ╚══════════════════════════════╝ -->
+<!-- ╔═══════════════════════════════╗
+     ║          GAME                 ║
+     ╚═══════════════════════════════╝ -->
 <div id="game-screen" class="screen">
 
-  <div class="stats-bar">
-    <div class="stat stat-kings">👑 <span id="kings-cnt">0</span>/4 király</div>
-    <div class="stat stat-logo">🦆 King's Cup 🐰</div>
-    <div class="stat stat-deck">🃏 <span id="deck-cnt">52</span> lap</div>
-  </div>
+  <!-- ── felső sáv: a pohár, a pakli és a kapcsolók ── -->
+  <header class="topbar">
+    <div class="cup" id="cup" role="img" aria-label="0 király a négyből">
+      <svg class="cup-svg" viewBox="0 0 60 76" aria-hidden="true">
+        <clipPath id="cup-clip">
+          <path d="M13 6 h34 l-3.5 52 a7 7 0 0 1 -7 6.5 h-13 a7 7 0 0 1 -7 -6.5 z"/>
+        </clipPath>
+        <g clip-path="url(#cup-clip)">
+          <g id="cup-fill" class="cup-fill">
+            <rect class="cup-liquid" x="0" y="0" width="60" height="76"/>
+            <rect class="cup-foam"   x="0" y="0" width="60" height="7"/>
+          </g>
+        </g>
+        <path class="cup-glass" d="M13 6 h34 l-3.5 52 a7 7 0 0 1 -7 6.5 h-13 a7 7 0 0 1 -7 -6.5 z"/>
+      </svg>
+      <span class="cup-count" id="cup-count">0/4</span>
+    </div>
 
-  <div class="effects" id="effects"></div>
+    <div class="brand">King's Cup</div>
 
+    <div class="topbar-right">
+      <div class="deck-meter" title="Hátralévő lapok">
+        <span class="deck-meter-bar"><span class="deck-meter-fill" id="deck-fill"></span></span>
+        <span id="deck-cnt">52</span>
+      </div>
+      <button class="icon-btn" type="button" data-action="sound" aria-label="Hang">🔊</button>
+      <button class="icon-btn" type="button" data-action="theme" aria-label="Téma">🌗</button>
+    </div>
+  </header>
+
+  <!-- ── tartós szabályok cetlijei ── -->
+  <div class="notes-strip" id="effects" aria-label="Érvényben lévő szabályok"></div>
+
+  <!-- ── aktuális játékos ── -->
   <div class="turn-area">
-    <div class="turn-label">🐰 Köre van:</div>
-    <div class="turn-name" id="turn-name">–</div>
+    <div class="turn-label">Köre van</div>
+    <div class="turn-name" id="turn-name" aria-live="polite">–</div>
   </div>
 
-  <div class="card-zone">
-    <div class="card-wrap" id="card-wrap" onclick="flipCard()">
-      <div class="card-inner" id="card-inner">
-        <div class="card-face card-back">
-          <div class="back-inner">
-            <div class="back-big">🦆</div>
-            <div class="back-title">King's Cup</div>
-            <div class="back-hint">Kattints a lapra! 🐰</div>
+  <!-- ── kártya ── -->
+  <div class="card-zone" id="card-zone">
+    <div class="card-slot" id="card-slot">
+      <div class="deck-stack" id="deck-stack" data-layers="4" aria-hidden="true">
+        <i></i><i></i><i></i><i></i>
+      </div>
+      <div class="card-shadow" aria-hidden="true"></div>
+
+      <div class="card-wrap" id="card-wrap" role="button" tabindex="0"
+           aria-label="Lap fordítása">
+        <div class="card-inner" id="card-inner">
+
+          <div class="card-face card-back">
+            <div class="back-inner">
+              <div class="back-medallion">🦆</div>
+              <div class="back-title">King's Cup</div>
+              <div class="back-hint">Koppints a lapra 🐰</div>
+            </div>
           </div>
-        </div>
-        <div class="card-face card-front" id="card-front">
-          <div class="card-sv" id="card-sv"></div>
-          <div class="card-rule" id="card-rule"></div>
-          <div class="card-desc" id="card-desc"></div>
+
+          <div class="card-face card-front" id="card-front">
+            <div class="card-head">
+              <div class="card-sv" id="card-sv"></div>
+              <div class="card-badge" id="card-badge"></div>
+            </div>
+            <div class="card-body" id="card-body">
+              <div class="card-rule" id="card-rule"></div>
+              <div class="card-desc" id="card-desc"></div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ── alsó sáv ── -->
   <div class="bottom">
     <input type="text" id="rule-word" class="rule-ctrl hidden" maxlength="24" autocomplete="off">
-    <select id="rule-target" class="rule-ctrl hidden"></select>
-    <div class="chips" id="chips"></div>
-    <button class="next-btn" id="next-btn" disabled onclick="nextTurn()">
-      Következő játékos 🐰
+    <div id="rule-target" class="rule-pick hidden" role="group" aria-label="Társ kiválasztása"></div>
+    <div class="chips" id="chips" aria-label="Játékosok"></div>
+    <button class="btn btn-sage btn-block" type="button" id="next-btn" disabled>
+      Következő 🐰
     </button>
   </div>
 
 </div>
 
-<!-- ╔══════════════════════════════╗
-     ║         END SCREEN          ║
-     ╚══════════════════════════════╝ -->
+<!-- ╔═══════════════════════════════╗
+     ║          END                  ║
+     ╚═══════════════════════════════╝ -->
 <div id="end-screen" class="screen">
-  <div class="end-icon" id="end-icon">👑</div>
-  <div class="end-title" id="end-title">Vége!</div>
-  <div class="end-sub" id="end-sub"></div>
-  <button class="new-btn" onclick="newGame()">🦆 Új játék! 🐰</button>
+
+  <!-- ── 1. leleplezés: ki issza meg a poharat ── -->
+  <div class="end-stage" id="end-stage">
+    <div class="end-eyebrow" id="end-eyebrow">A negyedik király</div>
+
+    <div class="end-hero">
+      <div class="end-spot" aria-hidden="true"></div>
+      <div class="end-face" id="end-face">🦆</div>
+
+      <!-- a pohár színültig, a hab kicsordul, a csepp folyik a peremen -->
+      <svg class="end-cup" viewBox="0 0 64 92" aria-hidden="true">
+        <clipPath id="end-cup-clip">
+          <path d="M12 20 h40 l-5 50 a8 8 0 0 1 -8 7 h-14 a8 8 0 0 1 -8 -7 z"/>
+        </clipPath>
+        <g clip-path="url(#end-cup-clip)">
+          <rect class="cup-liquid" x="0" y="20" width="64" height="72"/>
+          <rect class="cup-foam"   x="0" y="20" width="64" height="11"/>
+        </g>
+        <path class="cup-spill" d="M12 21 q5 -10 12 -4.5 q7 -9 14 -1.5 q8 -5 14 6 z"/>
+        <path class="cup-glass" d="M12 20 h40 l-5 50 a8 8 0 0 1 -8 7 h-14 a8 8 0 0 1 -8 -7 z"/>
+        <g class="end-drops">
+          <ellipse cx="8.5" cy="26" rx="2.8" ry="3.6"/>
+          <ellipse cx="55"  cy="24" rx="2.3" ry="3"/>
+          <ellipse cx="8.5" cy="26" rx="2"   ry="2.6"/>
+        </g>
+      </svg>
+    </div>
+
+    <h2 class="end-name" id="end-name">–</h2>
+    <p class="end-verdict" id="end-verdict"></p>
+  </div>
+
+  <!-- ── utolsó esély: pörgetés ── -->
+  <div class="end-wheel" id="end-wheel" hidden>
+    <p class="wheel-intro" id="wheel-intro">
+      Pörgetsz? <b>2/3</b>, hogy valaki még tölt bele.
+      <b>1/3</b>, hogy megúszod az egészet.
+    </p>
+
+    <div class="wheel-stage">
+      <div class="wheel-pointer" aria-hidden="true"></div>
+      <div class="wheel-disc" id="wheel-disc" aria-hidden="true">
+        <span style="--a:30deg">🍺</span>
+        <span style="--a:90deg">🎉</span>
+        <span style="--a:150deg">🍺</span>
+        <span style="--a:210deg">🍺</span>
+        <span style="--a:270deg">🎉</span>
+        <span style="--a:330deg">🍺</span>
+      </div>
+      <div class="wheel-hub" aria-hidden="true">🎡</div>
+    </div>
+
+    <div class="wheel-actions" id="wheel-actions">
+      <button class="btn btn-peach" type="button" id="spin-btn">🎡 Kockáztatok!</button>
+      <button class="btn-ghost" type="button" id="decline-btn">🍺 Inkább benyomom</button>
+    </div>
+
+    <p class="wheel-result" id="wheel-result" role="status" aria-live="polite" hidden></p>
+
+    <!-- amíg ez nincs megnyomva, nem indulhat új menet -->
+    <button class="btn btn-sage" type="button" id="drink-btn" hidden>✅ Megittam</button>
+  </div>
+
+  <!-- ── 2. kitüntetések ── -->
+  <div class="end-awards" id="end-awards" hidden></div>
+
+  <!-- ── 3. a menet mérlege ── -->
+  <div class="end-panel">
+    <div class="end-summary">
+      <span><b id="end-sum-cards">0</b> lap elfogyott</span>
+      <span><b id="end-sum-left">0</b> maradt</span>
+      <span><b id="end-sum-rules">0</b> élő szabály</span>
+    </div>
+    <div class="end-table" id="end-table"></div>
+  </div>
+
+  <div class="end-actions" id="end-actions">
+    <button class="btn btn-peach" type="button" id="again-btn">🔁 Még egy kört!</button>
+    <button class="btn-ghost" type="button" id="new-btn">🦆 Új névsor 🐰</button>
+  </div>
+
 </div>
 
-<script>
-// ── constants ──────────────────────────────────
-const SUITS = [
-  { sym: '♥', cls: 'suit-h' },
-  { sym: '♦', cls: 'suit-d' },
-  { sym: '♠', cls: 'suit-s' },
-  { sym: '♣', cls: 'suit-c' },
-];
-const VALUES = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-
-// ── szabálykészlet ─────────────────────────────
-// A király fix, a többi 12 slotot minden új játék a készletből sorsolja.
-// cat:     drink | rule | round | social | duel  — kategóriánként kvótával sorsolunk
-// persist: tartós hatás, cetli kerül ki melléje
-//          pick: self  → a húzó a szabály gazdája
-//                word  → beírt szó/név kerül a cetlire
-//                player→ a húzó választ egy másik játékost
-const KING_RULE = {
-  id: 'king', cat: 'king', name: 'Király 👑', color: '#c75146',
-  desc: 'Tölts a King\'s Cup pohárba! A 4. király húzója megissza az egészet! 👑🍺'
-};
-
-const RULE_POOL = [
-  // ── gyors, ivós ────────────────────────────
-  { id:'you',    cat:'drink', name:'You',      color:'#f4a261', desc:'Válassz valakit — ő iszik! 🍺' },
-  { id:'me',     cat:'drink', name:'Me',       color:'#f4a261', desc:'Te iszol! 🍺' },
-  { id:'girls',  cat:'drink', name:'Csajok',   color:'#f4a261', desc:'Minden lány iszik! 👩' },
-  { id:'guys',   cat:'drink', name:'Srácok',   color:'#f4a261', desc:'Minden fiú iszik! 👨' },
-  { id:'left',   cat:'drink', name:'Balra',    color:'#f4a261', desc:'A tőled balra ülő iszik! 🡄' },
-  { id:'cheers', cat:'drink', name:'Koccints', color:'#f4a261', desc:'Válassz valakit, koccintsatok — mindketten isztok! 🥂' },
-  { id:'gift',   cat:'drink', name:'Ajándék',  color:'#f4a261', desc:'Adj valakinek egy kortyot — de akkor te is iszol egy felet! 🎁' },
-
-  // ── tartós szabályok ───────────────────────
-  { id:'duck',   cat:'rule', name:'Kacsamester', color:'#87a878',
-    desc:'Bármikor csőrt formálhatsz a kezeddel — mindenki utánozzon, az utolsó iszik! A következő ugyanilyen lapig te vagy a mester. 🦆',
-    persist:{ emoji:'🦆', label:'Kacsamester', pick:'self', sub:'a köv. ugyanilyen lapig' } },
-  { id:'banned', cat:'rule', name:'Tiltott szó', color:'#87a878',
-    desc:'Válassz egy szót — a következő ugyanilyen lapig senki nem mondhatja ki! Aki kimondja, iszik. 🤐',
-    persist:{ emoji:'🤐', label:'Tiltott szó', pick:'word', ph:'Írd be a tiltott szót… 🤐' } },
-  { id:'mate',   cat:'rule', name:'Társ', color:'#87a878',
-    desc:'Válassz valakit! A következő ugyanilyen lapig amikor te iszol, ő is iszik. 🤝',
-    persist:{ emoji:'🤝', label:'Társ', pick:'player', sub:'együtt isznak' } },
-  { id:'nick',   cat:'rule', name:'Új név', color:'#87a878',
-    desc:'Adj valakinek új nevet! A következő ugyanilyen lapig aki a régin szólítja, iszik. 🏷️',
-    persist:{ emoji:'🏷️', label:'Új név', pick:'word', ph:'Mi legyen az új név? 🏷️' } },
-  { id:'quiz',   cat:'rule', name:'Kérdésmester', color:'#87a878',
-    desc:'A következő ugyanilyen lapig aki válaszol egy kérdésedre, iszik! Kérdezz ravaszul. ❓',
-    persist:{ emoji:'❓', label:'Kérdésmester', pick:'self', sub:'a köv. ugyanilyen lapig' } },
-
-  // ── körjátékok ─────────────────────────────
-  { id:'rhyme',  cat:'round', name:'Rímel',        color:'#87a878', desc:'Mondj egy szót, körben rímeljetek — aki elakad, iszik! 🎵' },
-  { id:'categ',  cat:'round', name:'Kategória',    color:'#87a878', desc:'Mondj egy kategóriát, körben soroljatok — aki elakad, iszik! 🗣️' },
-  { id:'chain',  cat:'round', name:'Szólánc',      color:'#87a878', desc:'Mondj egy szót — körben mindenki az előző utolsó betűjével kezdődőt mond. Aki elakad, iszik! 🔗' },
-  { id:'story',  cat:'round', name:'Sztori-lánc',  color:'#87a878', desc:'Kezdj egy mondatot egy szóval! Körben mindenki hozzátesz egyet — aki lezárja vagy elakad, iszik! 📖' },
-  { id:'echo',   cat:'round', name:'Visszhang',    color:'#87a878', desc:'Csinálj egy mozdulatot hanggal! Körben mindenki megismétli az eddigieket és hozzátesz egyet — aki elrontja, iszik! 🔁' },
-
-  // ── társasági ──────────────────────────────
-  { id:'never',  cat:'social', name:'Soha Nem Voltam', color:'#f4a261', desc:'3 ujj fel! Mondj valamit amit te nem csináltál — aki csinálta, lehajt egy ujjat és iszik! ✋' },
-  { id:'quest',  cat:'social', name:'Kérdések',        color:'#87a878', desc:'Kérdezz valakit → ő kérdéssel válaszol és kérdez mást → stb. Aki kijelentő mondatot mond vagy nevet, iszik! ❓' },
-  { id:'most',   cat:'social', name:'Ki az, aki…?',    color:'#f4a261', desc:'Tegyél fel egy „Ki az, aki…?" kérdést. Háromra mindenki mutasson valakire — akire a legtöbben mutattak, iszik! 👉' },
-  { id:'truth',  cat:'social', name:'Igaz vagy hamis?',color:'#87a878', desc:'Mondj magadról 3 állítást, egy hazugság! Aki nem találja ki melyik, iszik — ha mindenki kitalálja, te iszol! 🎭' },
-
-  // ── párbaj, kihívás ────────────────────────
-  { id:'vs',      cat:'duel', name:'Kacsa vagy Nyuszi', color:'#87a878', desc:'Háromra mindenki mutat: kacsacsőr 🦆 vagy nyuszifül 🐰! Aki kisebbségben van, iszik — döntetlennél mindenki! 🦆🐰' },
-  { id:'duel',    cat:'duel', name:'Párbaj',           color:'#87a878', desc:'Hívj ki valakit kő-papír-ollóra! A vesztes iszik. ⚔️' },
-  { id:'laugh',   cat:'duel', name:'Kibírod?',         color:'#87a878', desc:'30 másodpercig nem nevethetsz — a többiek mindent megtesznek, hogy megnevettessenek. Ha elmosolyodsz, iszol! 😐' },
-  { id:'fingers', cat:'duel', name:'Kacsaszám',        color:'#87a878', desc:'Tippelj meg egy számot hangosan! Háromra mindenki mutat 0–5 ujjat — ha eltaláltad az összeget, mindenki más iszik, ha nem, te! 🔢' },
-];
-
-const CATEGORIES = ['drink', 'rule', 'round', 'social', 'duel'];
-
-// ── state ──────────────────────────────────────
-let players = [], deck = [], curIdx = 0, kingsDrawn = 0, flipped = false;
-let ruleSet = {};      // lapérték → szabály (játékonként újrasorsolva)
-let activeNotes = {};  // szabály-id → { emoji, label, by, kind, sub, value }
-
-// ── helpers ────────────────────────────────────
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, c =>
-    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-}
-
-// szöveghossz → méretosztály (s1/s2/s3), hogy minden lap szövege beférjen
-function sizeClass(len, steps) {
-  let i = 0;
-  while (i < steps.length && len > steps[i]) i++;
-  return i ? ` s${i}` : '';
-}
-
-// A lapnév sosem törhet szó közepén: megmérjük a leghosszabb szót, és
-// addig kicsinyítjük a betűt, amíg kifér. (A karakterszám erre kevés —
-// a „Kacsaszám" 9 betű, de szélesebb, mint egy 12 betűs név.)
-function fitRuleName(el, name) {
-  el.style.fontSize = '';
-  el.textContent = name;
-
-  const avail   = el.clientWidth;
-  const longest = name.split(/\s+/).reduce((a, b) => b.length > a.length ? b : a, '');
-  const cs      = getComputedStyle(el);
-
-  // külön mérőelem: a .card-rule flex-konténer, azon a scrollWidth félrevezet
-  const probe = document.createElement('span');
-  probe.textContent = longest;
-  probe.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;';
-  probe.style.fontFamily = cs.fontFamily;
-  probe.style.fontStyle  = cs.fontStyle;
-  probe.style.fontWeight = cs.fontWeight;
-  probe.style.fontSize   = cs.fontSize;
-  document.body.appendChild(probe);
-
-  let size = parseFloat(cs.fontSize);
-  while (size > 22 && probe.getBoundingClientRect().width > avail) {
-    size -= 1;
-    probe.style.fontSize = size + 'px';
-  }
-  probe.remove();
-
-  if (size !== parseFloat(cs.fontSize)) el.style.fontSize = size + 'px';
-}
-
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-// ── szabálysorsolás ────────────────────────────
-// 12 szabad slot / 5 kategória → 2 kategória kap 3-at, a többi 2-t (3+3+2+2+2).
-// Hogy ne mindig ugyanaz a kettő legyen bővebb, azt is sorsoljuk.
-function pickRules() {
-  const quota = {};
-  CATEGORIES.forEach(c => quota[c] = 2);
-  shuffle([...CATEGORIES]).slice(0, 2).forEach(c => quota[c] = 3);
-
-  const chosen = [];
-  CATEGORIES.forEach(c => {
-    chosen.push(...shuffle(RULE_POOL.filter(r => r.cat === c)).slice(0, quota[c]));
-  });
-  return shuffle(chosen);
-}
-
-function buildRuleSet() {
-  const picked = pickRules();
-  const slots  = VALUES.filter(v => v !== 'K');
-  ruleSet = { K: KING_RULE };
-  slots.forEach((v, i) => ruleSet[v] = picked[i]);
-}
-
-// ── setup screen ───────────────────────────────
-function makePlayerRow(placeholder) {
-  const wrap = document.getElementById('players-wrap');
-  const row  = document.createElement('div');
-  row.className = 'player-row';
-
-  const inp = document.createElement('input');
-  inp.type = 'text'; inp.className = 'player-input';
-  inp.placeholder = placeholder; inp.maxLength = 20;
-  inp.addEventListener('input', syncStartBtn);
-
-  const rm = document.createElement('button');
-  rm.className = 'rm-btn'; rm.title = 'Törlés'; rm.textContent = '✕';
-  rm.addEventListener('click', () => { row.remove(); syncStartBtn(); });
-
-  row.append(inp, rm);
-  wrap.appendChild(row);
-  inp.focus();
-  syncStartBtn();
-}
-
-function syncStartBtn() {
-  const names = getNames();
-  document.getElementById('start-btn').disabled = names.length < 2;
-}
-
-function getNames() {
-  return [...document.querySelectorAll('.player-input')]
-    .map(i => i.value.trim()).filter(Boolean);
-}
-
-document.getElementById('add-btn').addEventListener('click', () => {
-  const n = document.querySelectorAll('.player-input').length + 1;
-  makePlayerRow(`Játékos ${n} neve…`);
-});
-
-document.getElementById('start-btn').addEventListener('click', () => {
-  const names = getNames();
-  if (names.length < 2) {
-    document.getElementById('err-msg').textContent = 'Legalább 2 játékos szükséges! 🦆';
-    return;
-  }
-  document.getElementById('err-msg').textContent = '';
-  players = names;
-  initGame();
-});
-
-// ── game init ──────────────────────────────────
-function initGame() {
-  deck = shuffle(SUITS.flatMap(s => VALUES.map(v => ({ v, s }))));
-  curIdx = 0; kingsDrawn = 0; flipped = false;
-  activeNotes = {};
-  buildRuleSet();
-  resetCard();
-  updateGame();
-  show('game-screen');
-}
-
-function updateGame() {
-  document.getElementById('turn-name').textContent = players[curIdx];
-  document.getElementById('kings-cnt').textContent = kingsDrawn;
-  document.getElementById('deck-cnt').textContent  = deck.length;
-
-  document.getElementById('chips').innerHTML =
-    players.map((p,i) =>
-      `<div class="chip${i===curIdx?' active':''}">${esc(p)}</div>`
-    ).join('');
-
-  renderEffects();
-}
-
-// tartós hatások cetlijei — bármelyik persist-es szabályból kikerülhet
-function renderEffects() {
-  const html = Object.values(activeNotes).map((n, i) => {
-    let main, sub;
-    if (n.kind === 'self') {
-      main = esc(n.by);            sub = n.sub;
-    } else if (n.kind === 'player') {
-      main = `${esc(n.by)} <span class="note-x">↔</span> ${n.value ? esc(n.value) : '?'}`;
-      sub  = n.sub;
-    } else {
-      main = n.value ? esc(n.value) : '…';
-      sub  = `${esc(n.by)} szabálya`;
-    }
-    const editable = n.kind !== 'self';
-    return `<div class="note note-${i % 2 ? 'b' : 'a'}${editable ? ' note-edit' : ''}"
-                 ${editable ? `onclick="editNote('${n.id}')" title="Kattints a módosításhoz"` : ''}>
-              <div class="note-label">${n.label} ${n.emoji}</div>
-              <div class="note-word">${main}</div>
-              <div class="note-by">${sub}</div>
-            </div>`;
-  });
-  document.getElementById('effects').innerHTML = html.join('');
-}
-
-// a tartós szabály beállítója: szövegdoboz vagy játékosválasztó
-function openNoteCtrl(id) {
-  const n    = activeNotes[id];
-  const word = document.getElementById('rule-word');
-  const sel  = document.getElementById('rule-target');
-  word.classList.add('hidden');
-  sel.classList.add('hidden');
-  if (!n || n.kind === 'self') return;
-
-  if (n.kind === 'word') {
-    word.value = n.value;
-    word.placeholder = n.ph;
-    word.dataset.id = id;
-    word.classList.remove('hidden');
-    setTimeout(() => word.focus(), 60);
-  } else {
-    sel.dataset.id = id;
-    sel.innerHTML = `<option value="">Válaszd ki a társad… 🤝</option>` +
-      players.filter(p => p !== n.by)
-             .map(p => `<option${p === n.value ? ' selected' : ''}>${esc(p)}</option>`).join('');
-    sel.classList.remove('hidden');
-  }
-}
-
-// cetlire kattintva újranyílik a beállító (elgépelés / névcsere javítása)
-function editNote(id) {
-  openNoteCtrl(id);
-  const el = document.getElementById(activeNotes[id].kind === 'word' ? 'rule-word' : 'rule-target');
-  el.focus();
-}
-
-function hideNoteCtrl() {
-  document.getElementById('rule-word').classList.add('hidden');
-  document.getElementById('rule-target').classList.add('hidden');
-}
-
-function resetCard() {
-  document.getElementById('card-inner').classList.remove('flipped');
-  document.getElementById('card-wrap').classList.remove('no-click');
-  document.getElementById('next-btn').disabled = true;
-  hideNoteCtrl();
-
-  // az előlap ürítése, hogy a lefordított lap mindig alapméretű legyen
-  document.getElementById('card-sv').textContent = '';
-  document.getElementById('card-rule').textContent = '';
-  document.getElementById('card-desc').textContent = '';
-
-  flipped = false;
-}
-
-// ── flip ───────────────────────────────────────
-function flipCard() {
-  if (flipped || deck.length === 0) return;
-  flipped = true;
-
-  const card = deck.pop();
-  const rule = ruleSet[card.v];
-
-  document.getElementById('card-sv').innerHTML =
-    `<span class="${card.s.cls}">${card.v}${card.s.sym}</span>`;
-
-  const ruleEl = document.getElementById('card-rule');
-  ruleEl.style.color = rule.color;
-  ruleEl.className   = 'card-rule' + sizeClass(rule.name.length, [11, 14]);
-  fitRuleName(ruleEl, rule.name);
-
-  const descEl = document.getElementById('card-desc');
-  descEl.textContent = rule.desc;
-  descEl.className   = 'card-desc' + sizeClass(rule.desc.length, [60, 80, 108, 120]);
-  document.getElementById('card-inner').classList.add('flipped');
-  document.getElementById('card-wrap').classList.add('no-click');
-
-  // track kings
-  if (card.v === 'K') {
-    kingsDrawn++;
-    document.getElementById('kings-cnt').textContent = kingsDrawn;
-  }
-
-  // tartós hatás átvétele — nem lapértékre, hanem a szabály azonosítójára figyelünk,
-  // mert a szabályok minden játékban más lapra kerülnek
-  if (rule.persist) {
-    activeNotes[rule.id] = {
-      id:    rule.id,
-      emoji: rule.persist.emoji,
-      label: rule.persist.label,
-      kind:  rule.persist.pick,
-      sub:   rule.persist.sub || '',
-      ph:    rule.persist.ph  || '',
-      by:    players[curIdx],
-      value: ''
-    };
-    renderEffects();
-    // csak akkor nyíljon meg, ha még mindig ez a kör tart (gyors továbblépés ellen)
-    if (rule.persist.pick !== 'self') {
-      setTimeout(() => { if (flipped) openNoteCtrl(rule.id); }, 700);
-    }
-  }
-
-  document.getElementById('deck-cnt').textContent = deck.length;
-
-  if (kingsDrawn >= 4) {
-    setTimeout(() => endGame('kings'), 1300);
-    return;
-  }
-  if (deck.length === 0) {
-    setTimeout(() => endGame('deck'), 1300);
-    return;
-  }
-
-  document.getElementById('next-btn').disabled = false;
-}
-
-// ── next turn ──────────────────────────────────
-function nextTurn() {
-  if (!flipped) return;
-  curIdx = (curIdx + 1) % players.length;
-  resetCard();
-  updateGame();
-}
-
-// ── end game ───────────────────────────────────
-function endGame(reason) {
-  if (reason === 'kings') {
-    document.getElementById('end-icon').textContent  = '👑🍺';
-    document.getElementById('end-title').innerHTML   = 'A 4. Király!';
-    document.getElementById('end-sub').textContent   =
-      `${players[curIdx]} húzta a 4. királyt — meg kell inni a King's Cup tartalmát! 🦆🍺`;
-  } else {
-    document.getElementById('end-icon').textContent  = '🃏';
-    document.getElementById('end-title').innerHTML   = 'Vége a<br>paklinek!';
-    document.getElementById('end-sub').textContent   =
-      'Nincs több lap a pakliban — a játéknak vége! 🦆🐰';
-  }
-  show('end-screen');
-}
-
-// ── tartós szabályok beállítói ─────────────────
-document.getElementById('rule-word').addEventListener('input', e => {
-  const n = activeNotes[e.target.dataset.id];
-  if (!n) return;
-  n.value = e.target.value.trim();
-  renderEffects();
-});
-document.getElementById('rule-word').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.target.blur(); hideNoteCtrl(); }
-});
-document.getElementById('rule-target').addEventListener('change', e => {
-  const n = activeNotes[e.target.dataset.id];
-  if (!n) return;
-  n.value = e.target.value;
-  renderEffects();
-  if (n.value) hideNoteCtrl();
-});
-
-// ── new game ───────────────────────────────────
-function newGame() {
-  document.getElementById('players-wrap').innerHTML = '';
-  makePlayerRow('Játékos 1 neve…');
-  makePlayerRow('Játékos 2 neve…');
-  syncStartBtn();
-  show('setup-screen');
-}
-
-// ── boot ───────────────────────────────────────
-makePlayerRow('Játékos 1 neve…');
-makePlayerRow('Játékos 2 neve…');
-syncStartBtn();
-</script>
+<script type="module" src="./assets/js/main.js"></script>
 </body>
 </html>

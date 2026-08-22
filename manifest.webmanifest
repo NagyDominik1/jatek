@@ -1,0 +1,30 @@
+{
+  "name": "King's Cup 🦆🐰",
+  "short_name": "King's Cup",
+  "description": "Kacsás-nyuszis ivós kártyajáték — telepíthető, offline is működik.",
+  "lang": "hu",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "any",
+  "background_color": "#f4ead5",
+  "theme_color": "#f4ead5",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

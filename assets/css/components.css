@@ -1,0 +1,429 @@
+/* ═══════════════════════════════════════════════
+   COMPONENTS — gombok, mezők, avatarok, cetlik, pohár
+
+   Minden :hover a @media (hover:hover) mögött van:
+   érintőképernyőn a hover „beragad" az utolsó
+   megérintett elemen, ezért ott csak :active van.
+═══════════════════════════════════════════════ */
+
+/* ───────────────────────────────
+   GOMBOK — tömör, 3D-s „nyomógomb"
+─────────────────────────────── */
+.btn {
+  --btn-bg:    var(--accent);
+  --btn-shade: var(--accent-d);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 56px;            /* kényelmes hüvelykujj-célpont */
+  padding: 15px 40px;
+  border: none;
+  border-radius: var(--r-lg);
+
+  background: var(--btn-bg);
+  color: var(--on-accent);
+  box-shadow: 0 5px 0 var(--btn-shade), var(--shadow-2);
+
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(21px, 5vw, 28px);
+  line-height: 1.1;
+
+  cursor: pointer;
+  transition: transform .14s var(--ease), box-shadow .14s var(--ease), opacity .2s;
+}
+
+.btn-lg { padding: 17px 56px; font-size: clamp(24px, 6vw, 30px); }
+.btn-block { width: 100%; }
+
+.btn-peach { --btn-bg: var(--accent-2); --btn-shade: var(--accent-2d); }
+.btn-sage  { --btn-bg: var(--accent-3); --btn-shade: var(--accent-3d); }
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 var(--btn-shade), var(--shadow-3);
+  }
+}
+.btn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--btn-shade), var(--shadow-1);
+}
+.btn:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 5px 0 var(--btn-shade);
+}
+
+/* körvonalas, szaggatott „hozzáadás" gomb */
+.btn-ghost {
+  width: 100%;
+  min-height: 52px;
+  padding: 13px 20px;
+  border: 2px dashed var(--accent-3);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--accent-3d);
+  box-shadow: none;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 17px;
+
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .12s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover { background: color-mix(in srgb, var(--accent-3) 14%, transparent); border-color: var(--accent-3d); }
+}
+.btn-ghost:active { transform: scale(.985); background: color-mix(in srgb, var(--accent-3) 18%, transparent); }
+
+/* kis ikongomb (hang, téma) */
+.icon-btn {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .18s, transform .12s, color .18s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+}
+.icon-btn:active { transform: scale(.9); }
+.icon-btn.is-off { opacity: .42; }
+
+/* ───────────────────────────────
+   MEZŐK
+─────────────────────────────── */
+.field {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  padding: 13px 16px;
+  border: 2px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
+
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 17px;                /* ≥16px: az iOS így nem zoomol rá */
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field::placeholder { color: var(--text-faint); }
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* ───────────────────────────────
+   JÁTÉKOS-SOR (setup)
+─────────────────────────────── */
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: rowIn .26s var(--spring);
+}
+@keyframes rowIn {
+  from { opacity: 0; transform: translateX(-14px); }
+}
+.player-row.is-leaving {
+  animation: rowOut .18s var(--ease) forwards;
+}
+@keyframes rowOut {
+  to { opacity: 0; transform: translateX(-14px) scale(.96); }
+}
+
+/* avatar-gomb: kattintásra emojit vált */
+.avatar {
+  flex-shrink: 0;
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  border: 2px solid var(--av-color, var(--accent-2));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--av-color, var(--accent-2)) 16%, transparent);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .16s var(--spring), background .2s;
+}
+.avatar:active { transform: scale(.88) rotate(-8deg); }
+.avatar.is-rolling { animation: avRoll .3s var(--spring); }
+@keyframes avRoll {
+  50% { transform: scale(1.16) rotate(10deg); }
+}
+
+.rm-btn {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border: none;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-size: 17px;
+  cursor: pointer;
+  transition: background .16s, transform .12s, color .16s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rm-btn:hover { background: var(--accent); color: var(--on-accent); }
+}
+.rm-btn:active { transform: scale(.88); }
+
+/* ───────────────────────────────
+   JÁTÉKOS-ZSETONOK (game, alsó sáv)
+─────────────────────────────── */
+.chips {
+  display: flex;
+  gap: 8px;
+  padding: 2px 4px 6px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+.chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 56px;
+  scroll-snap-align: center;
+  opacity: .5;
+  transition: opacity .3s var(--ease), transform .3s var(--spring);
+}
+.chip-face {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  font-size: 19px;
+  line-height: 1;
+}
+.chip-name {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+}
+.chip.active {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+.chip.active .chip-face {
+  border-color: var(--chip-color, var(--accent-2));
+  background: color-mix(in srgb, var(--chip-color, var(--accent-2)) 22%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chip-color, var(--accent-2)) 26%, transparent);
+}
+.chip.active .chip-name { color: var(--text); font-weight: 500; }
+
+/* ───────────────────────────────
+   CETLIK — tartós szabályok
+─────────────────────────────── */
+.notes-strip {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  max-width: 680px;
+  margin-inline: auto;
+  padding: 10px 4px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.notes-strip::-webkit-scrollbar { display: none; }
+.notes-strip:empty { display: none; }
+
+.note {
+  position: relative;
+  flex-shrink: 0;
+  width: 148px;
+  padding: 15px 13px 11px;
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
+  background: var(--note-bg);
+  box-shadow: 2px 5px 14px var(--card-shadow-color);
+  text-align: center;
+  transition: transform .2s var(--spring);
+}
+.note.is-new { animation: notePop .34s var(--spring); }
+@keyframes notePop {
+  from { opacity: 0; transform: scale(.84) rotate(-8deg); }
+}
+
+/* ragasztószalag */
+.note::before {
+  content: '';
+  position: absolute;
+  top: -8px; left: 50%;
+  width: 54px; height: 16px;
+  transform: translateX(-50%) rotate(-2.5deg);
+  background: color-mix(in srgb, var(--note-tint, var(--accent-2)) 42%, transparent);
+  border-left: 1px dashed color-mix(in srgb, var(--card-bg) 60%, transparent);
+  border-right: 1px dashed color-mix(in srgb, var(--card-bg) 60%, transparent);
+}
+
+.note-a { transform: rotate(-2.2deg); }
+.note-b { transform: rotate(1.6deg); }
+.note-edit { cursor: pointer; }
+.note-edit::after {
+  content: '✎';
+  position: absolute;
+  right: 6px; bottom: 4px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+@media (hover: hover) and (pointer: fine) {
+  .note-a.note-edit:hover { transform: rotate(-2.2deg) translateY(-4px); }
+  .note-b.note-edit:hover { transform: rotate(1.6deg)  translateY(-4px); }
+}
+.note-a.note-edit:active { transform: rotate(-2.2deg) scale(.97); }
+.note-b.note-edit:active { transform: rotate(1.6deg)  scale(.97); }
+
+.note-label {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.note-word {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.14;
+  color: var(--note-tint, var(--accent));
+  margin: 4px 0 5px;
+  overflow-wrap: anywhere;
+}
+.note-x  { font-style: normal; opacity: .4; }
+.note-by { font-size: 10.5px; color: var(--text-faint); }
+
+/* ── kompakt változat alacsony kijelzőre ──
+   Telefonon minden függőleges pixel a kártyáé: a cetlik
+   és a zsetonok összehúzódnak, hogy a lap nagy maradhasson. */
+@media (max-height: 780px) {
+  .notes-strip { gap: 10px; padding: 7px 4px 2px; }
+  .note { width: 124px; padding: 12px 10px 8px; }
+  .note::before { top: -6px; width: 44px; height: 13px; }
+  .note-word { font-size: 18px; margin: 3px 0 4px; }
+  .note-label, .note-by { font-size: 9.5px; }
+
+  .chip { width: 48px; }
+  .chip-face { width: 34px; height: 34px; font-size: 16px; }
+  .chips { gap: 6px; padding-bottom: 4px; }
+
+  .btn { min-height: 50px; padding: 12px 30px; font-size: clamp(19px, 4.8vw, 25px); }
+  .btn-lg { padding: 14px 44px; }
+}
+
+/* nagy képernyőn a cetlik kiülnek a jobb szélre, mint egy parafatábla */
+@media (min-width: 1000px) {
+  .notes-strip {
+    position: fixed;
+    top: calc(var(--sat) + 96px);
+    right: calc(var(--sar) + 22px);
+    width: auto;
+    max-width: 172px;
+    flex-direction: column;
+    align-items: flex-end;
+    overflow: visible;
+    z-index: 40;
+  }
+}
+
+/* ───────────────────────────────
+   KING'S CUP — telő pohár
+   A játék tétje: minden király egy szinttel
+   feljebb tölti, a 4. túlcsordul.
+─────────────────────────────── */
+.cup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: default;
+}
+.cup-svg { width: 26px; height: 33px; display: block; }
+.cup-glass { fill: none; stroke: var(--text-dim); stroke-width: 5; stroke-linejoin: round; }
+/* a teljes töltet egyben skálázódik alulról fölfelé,
+   így a hab mindig a folyadék tetején marad */
+.cup-fill { transform: scaleY(0); transform-origin: 50% 100%; transition: transform .85s var(--spring); }
+.cup-liquid { fill: var(--cat-king); }
+.cup-foam   { fill: color-mix(in srgb, var(--cat-king) 40%, #fff); }
+.cup-count {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cat-king);
+  white-space: nowrap;
+}
+.cup.is-filling { animation: cupBump .5s var(--spring); }
+@keyframes cupBump {
+  40% { transform: scale(1.14) rotate(-4deg); }
+}
+.cup.is-full .cup-count { color: var(--accent); font-weight: 600; }
+
+/* ───────────────────────────────
+   PAKLI-SZÁMLÁLÓ
+─────────────────────────────── */
+.deck-meter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 14px;
+  color: var(--accent-3d);
+  white-space: nowrap;
+}
+.deck-meter-bar {
+  width: 34px; height: 5px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+.deck-meter-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--accent-3);
+  transform-origin: left center;
+  transition: transform .5s var(--ease);
+}
+
+/* ───────────────────────────────
+   KÉPERNYŐ-RÁZÁS (4. király)
+─────────────────────────────── */
+.shake { animation: shake .5s cubic-bezier(.36, .07, .19, .97); }
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); }
+  40%, 60% { transform: translateX(7px); }
+}
