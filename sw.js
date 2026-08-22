@@ -11,7 +11,7 @@
    kell (vagy kiüríted a cache-t), emeld a VERSION-t.
 ═══════════════════════════════════════════════ */
 
-const VERSION = 'v11';
+const VERSION = 'v12';
 const SHELL = `kingscup-shell-${VERSION}`;
 const FONTS = `kingscup-fonts-${VERSION}`;
 

@@ -268,21 +268,50 @@
   color: var(--text-faint);
 }
 
+/* a név viszi Instára, mellette a másolás mint tartalék */
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 3px 0 9px;
+}
+
 .info-handle {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  width: 100%;
-  margin: 3px 0 9px;
   padding: 0;
   border: none;
   background: none;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: transform .14s var(--spring);
 }
 .info-handle:active { transform: scale(.97); }
+
+.info-copy-btn {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .18s, transform .12s, border-color .18s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .info-copy-btn:hover { background: var(--surface-2); border-color: var(--accent-3); }
+}
+.info-copy-btn:active { transform: scale(.88); }
+.info-copy-btn.is-copied { border-color: var(--accent-3d); background: color-mix(in srgb, var(--accent-3) 20%, transparent); }
 
 .info-name {
   font-family: 'Fraunces', Georgia, serif;
@@ -304,8 +333,8 @@
   color: var(--text-faint);
   transition: color .2s;
 }
-.info-handle.is-copied .info-name { color: var(--accent-3d); }
-.info-handle.is-copied .info-copy { color: var(--accent-3d); }
+.info-row.is-copied .info-name { color: var(--accent-3d); }
+.info-row.is-copied .info-copy { color: var(--accent-3d); }
 
 .info-note {
   font-size: 12.5px;

@@ -379,11 +379,17 @@ function wireInfo() {
     fx.sfx.tap();
   });
 
-  // a névre koppintva vágólapra kerül — így mindegy, melyik appban keres rá
-  const hint = $('info-copy');
-  const HINT_IDLE = '📋 bökj rá, kimásolom';
+  /* A név maga egy sima link — a böngésző/Instagram app viszi tovább.
+     A másolás gomb a tartalék: offline PWA-ban vagy beépített
+     böngészőben a link nem mindig nyílik meg. */
+  handle.addEventListener('click', e => e.stopPropagation());
 
-  handle.addEventListener('click', async e => {
+  const row = handle.closest('.info-row');
+  const hint = $('info-copy');
+  const copyBtn = $('info-copy-btn');
+  const HINT_IDLE = '📸 koppints, viszlek Instára';
+
+  copyBtn.addEventListener('click', async e => {
     e.stopPropagation();
     try {
       await navigator.clipboard.writeText('n_dom1n1k');
@@ -400,12 +406,14 @@ function wireInfo() {
       } catch { /* ennyi tellett */ }
       return;
     }
-    handle.classList.add('is-copied');
+    row.classList.add('is-copied');
+    copyBtn.classList.add('is-copied');
     hint.textContent = '✅ megvan, kimásoltam';
     fx.sfx.next();
     fx.buzz(10);
     setTimeout(() => {
-      handle.classList.remove('is-copied');
+      row.classList.remove('is-copied');
+      copyBtn.classList.remove('is-copied');
       hint.textContent = HINT_IDLE;
     }, 1800);
   });
