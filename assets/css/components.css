@@ -105,6 +105,38 @@
 .icon-btn:active { transform: scale(.9); }
 .icon-btn.is-off { opacity: .42; }
 
+/* telepítés-pirula: az ikongombok mellett ül, de felirattal —
+   egy magányos letöltés-nyílról senki nem találná ki, mit csinál */
+.install-btn {
+  height: 40px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--accent-3d, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-3) 14%, var(--surface));
+  color: var(--text);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .18s, transform .12s;
+}
+.install-btn[hidden] { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .install-btn:hover { background: color-mix(in srgb, var(--accent-3) 24%, var(--surface)); }
+}
+.install-btn:active { transform: scale(.94); }
+
+/* szűk telefonon a felirat elviszi a helyet a névsor elől */
+@media (max-width: 380px) {
+  .install-btn { padding: 0 11px; font-size: 0; gap: 0; }
+  .install-btn span { font-size: 17px; }
+}
+
 /* ───────────────────────────────
    MEZŐK
 ─────────────────────────────── */
@@ -506,6 +538,22 @@
 }
 .ci-persist[hidden] { display: none; }
 .ci-ok { width: 100%; margin-top: 14px; }
+
+/* telepítési lépések */
+.install-steps {
+  margin: 12px 0 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.install-steps li::marker {
+  color: var(--accent-3);
+  font-family: 'DM Mono', ui-monospace, monospace;
+}
+.install-steps b { color: var(--text); font-weight: 600; }
 
 /* ───────────────────────────────
    KÉPERNYŐ-RÁZÁS (4. király)

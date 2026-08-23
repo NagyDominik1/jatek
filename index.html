@@ -14,7 +14,10 @@
 
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./assets/icon.svg">
+<link rel="icon" href="./assets/icon-192.png" sizes="192x192" type="image/png">
+<!-- iOS nem olvassa a manifest ikonjait, és SVG-t sem fogad el:
+     enélkül a főképernyőre egy pixeles képernyőkép kerülne -->
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
 
 <!-- mindkét fonthoszthoz kell preconnect: a gstatic nélkül egy plusz
      kapcsolatfelépítés csúszik a szövegek megjelenése elé mobilneten -->
@@ -40,6 +43,10 @@
 <div id="setup-screen" class="screen active">
 
   <div class="setup-tools">
+    <!-- csak akkor kerül elő, ha a böngésző tényleg tud telepíteni -->
+    <button class="install-btn" type="button" id="install-btn" hidden>
+      <span aria-hidden="true">⬇</span> Telepítés
+    </button>
     <button class="icon-btn" type="button" data-action="sound" aria-label="Hang">🔊</button>
     <button class="icon-btn" type="button" data-action="theme" aria-label="Téma">🌗</button>
   </div>
@@ -306,6 +313,20 @@
     amíg elő nem kerül ugyanaz a lapérték.
   </p>
   <button class="btn btn-sage ci-ok" type="button" id="ci-ok">Értem 👍</button>
+</dialog>
+
+<!-- ╔═══════════════════════════════╗
+     ║   TELEPÍTÉS (kézi útmutató)   ║
+     ╚═══════════════════════════════╝ -->
+<dialog class="info-dialog" id="install-dialog" aria-labelledby="install-title">
+  <div class="ci-head">
+    <span class="ci-badge">📲 Telepítés</span>
+    <button class="ci-close" type="button" id="install-close" aria-label="Bezárás">✕</button>
+  </div>
+  <h3 class="ci-name" id="install-title">Tedd ki a kezdőképernyőre</h3>
+  <p class="ci-long">Így ikonról indul, keret nélkül, és net sem kell hozzá:</p>
+  <ol class="install-steps" id="install-steps"></ol>
+  <button class="btn btn-sage ci-ok" type="button" id="install-ok">Értem 👍</button>
 </dialog>
 
 <script type="module" src="./assets/js/main.js"></script>

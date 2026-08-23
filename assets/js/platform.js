@@ -42,6 +42,19 @@ export function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   if (location.protocol === 'file:') return;   // fájlrendszerről nem regisztrálható
 
+  /* Új verzió átvételekor egyszer újratöltünk, különben a lap
+     félig a régi, félig az új fájlokkal futna tovább. Csak akkor,
+     ha MÁR volt vezérlő: az első telepítés claim()-je egyébként
+     rögtön újratöltené az oldalt az első látogatáskor. */
+  if (navigator.serviceWorker.controller) {
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloading) return;
+      reloading = true;
+      location.reload();
+    });
+  }
+
   addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {
       /* pl. nem biztonságos eredet — a játék enélkül is teljes értékű */

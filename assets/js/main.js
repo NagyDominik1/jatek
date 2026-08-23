@@ -12,6 +12,7 @@ import * as deck from './deck.js';
 import * as end from './end.js';
 import * as wheel from './wheel.js';
 import { keepAwake, registerSW } from './platform.js';
+import { initInstall } from './install.js';
 
 const DECK_SIZE = 52;
 const FLIP_MS = 620;
@@ -483,3 +484,4 @@ players.resetSetup();    // mindig üres névsorral indulunk
 syncStartBtn();
 deck.initCardSizing();   // a ResizeObserver akkor mér, amikor a zóna láthatóvá válik
 registerSW();
+initInstall({ onTap: () => fx.sfx.tap() });

@@ -1,0 +1,18 @@
+# Csak a helyi XAMPP-hoz kell — élesben (Vercel) a vercel.json intézi,
+# ezt a fájlt ott figyelmen kívül hagyják.
+#
+# Az Apache alapból nem ismeri a .webmanifest kiterjesztést, és
+# Content-Type nélkül küldi el. A service workert pedig nem szabad
+# sokáig gyorsítótárazni, különben a frissítés nem jut át.
+
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/svg+xml            .svg
+</IfModule>
+
+# mod_headers nélkül a Header direktíva 500-at dobna, ezért a burok
+<IfModule mod_headers.c>
+  <FilesMatch "sw\.js$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>

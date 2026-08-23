@@ -11,7 +11,7 @@
    kell (vagy kiüríted a cache-t), emeld a VERSION-t.
 ═══════════════════════════════════════════════ */
 
-const VERSION = 'v17';
+const VERSION = 'v18';
 const SHELL = `kingscup-shell-${VERSION}`;
 const FONTS = `kingscup-fonts-${VERSION}`;
 
@@ -20,6 +20,9 @@ const ASSETS = [
   './index.html',
   './manifest.webmanifest',
   './assets/icon.svg',
+  './assets/icon-192.png',
+  './assets/icon-512.png',
+  './assets/apple-touch-icon.png',
   './assets/css/tokens.css',
   './assets/css/base.css',
   './assets/css/components.css',
@@ -35,6 +38,7 @@ const ASSETS = [
   './assets/js/end.js',
   './assets/js/wheel.js',
   './assets/js/platform.js',
+  './assets/js/install.js',
 ];
 
 self.addEventListener('install', event => {
