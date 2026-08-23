@@ -40,9 +40,14 @@ export function initCardSizing() {
 /* ───────────────────────────────
    ELŐLAP
 ─────────────────────────────── */
+/* az éppen kifordított lap — az infó gomb ebből dolgozik */
+let current = null;
+export function currentRule() { return current; }
+
 export function renderFront(card, rule) {
   const front = $('card-front');
   const meta = CAT_META[rule.cat] || CAT_META.drink;
+  current = rule;
 
   front.style.setProperty('--cat', meta.var);
   front.classList.toggle('is-king', rule.cat === 'king');
@@ -56,6 +61,7 @@ export function renderFront(card, rule) {
 }
 
 export function clearFront() {
+  current = null;
   $('card-sv').textContent = '';
   $('card-badge').textContent = '';
   $('card-rule').textContent = '';
@@ -91,9 +97,9 @@ function fitCard() {
   const wordW = measurer.measureText(longest).width;
   const avail = rule.clientWidth;
 
-  // 2px ráhagyás: pontosan a határra állítva a kerekítés még kilóghat
+  // 4px ráhagyás: a betűméret kerekítése miatt a pontos határ még kilóg
   let hi = 1;
-  if (wordW > avail - 2 && avail > 8) hi = Math.max(MIN_FIT, (avail - 2) / wordW);
+  if (wordW > avail - 4 && avail > 12) hi = Math.max(MIN_FIT, (avail - 4) / wordW);
   set(hi);
 
   // 2) függőleges korlát felezéssel

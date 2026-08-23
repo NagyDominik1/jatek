@@ -11,7 +11,7 @@
    kell (vagy kiüríted a cache-t), emeld a VERSION-t.
 ═══════════════════════════════════════════════ */
 
-const VERSION = 'v13';
+const VERSION = 'v17';
 const SHELL = `kingscup-shell-${VERSION}`;
 const FONTS = `kingscup-fonts-${VERSION}`;
 
@@ -40,7 +40,10 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(SHELL)
-      .then(c => c.addAll(ASSETS))
+      /* cache:'reload' — enélkül az addAll a böngésző HTTP-gyorsítótárán
+         keresztül tölt, és egy verzióemelés után is a RÉGI fájlokat sütné
+         be a saját cache-ébe. Innentől a telepítés mindig hálózatról hoz. */
+      .then(c => c.addAll(ASSETS.map(u => new Request(u, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });

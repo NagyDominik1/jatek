@@ -418,6 +418,96 @@
 }
 
 /* ───────────────────────────────
+   LAP-RÉSZLETEK PÁRBESZÉD
+   Natív <dialog>: az Escape, a fókuszcsapda és a
+   háttér elsötétítése jár hozzá, nem kell megírni.
+─────────────────────────────── */
+.info-dialog {
+  /* a globális * { margin: 0 } reset kilövi a <dialog> alapértelmezett
+     margin:auto-ját, ezért a modális a bal felső sarokba ragadna */
+  margin: auto;
+  width: min(92vw, 400px);
+  max-height: 82dvh;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.info-dialog::backdrop {
+  background: rgba(0, 0, 0, .55);
+  backdrop-filter: blur(2px);
+}
+.info-dialog[open] { animation: infoPop .26s var(--spring); }
+
+.ci-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ci-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat, var(--accent-2)) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat, var(--accent-2)) 40%, transparent);
+  color: var(--cat, var(--accent-2));
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ci-close {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .18s, transform .12s;
+}
+.ci-close:active { transform: scale(.9); }
+
+.ci-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(26px, 7vw, 34px);
+  line-height: 1.1;
+  color: var(--cat, var(--accent-2));
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+}
+.ci-long {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.ci-persist {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--cat-rule) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat-rule) 30%, transparent);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+.ci-persist[hidden] { display: none; }
+.ci-ok { width: 100%; margin-top: 14px; }
+
+/* ───────────────────────────────
    KÉPERNYŐ-RÁZÁS (4. király)
 ─────────────────────────────── */
 .shake { animation: shake .5s cubic-bezier(.36, .07, .19, .97); }

@@ -181,6 +181,10 @@
               <div class="card-rule" id="card-rule"></div>
               <div class="card-desc" id="card-desc"></div>
             </div>
+
+            <!-- részletes leírás: a lapra csak a rövid szöveg fér el -->
+            <button class="card-info" type="button" id="card-info-btn"
+                    aria-label="Mit jelent ez a lap?">i</button>
           </div>
 
         </div>
@@ -286,6 +290,23 @@
   </div>
 
 </div>
+
+<!-- ╔═══════════════════════════════╗
+     ║   LAP-RÉSZLETEK (párbeszéd)   ║
+     ╚═══════════════════════════════╝ -->
+<dialog class="info-dialog" id="card-info-dialog" aria-labelledby="ci-name">
+  <div class="ci-head">
+    <span class="ci-badge" id="ci-badge"></span>
+    <button class="ci-close" type="button" id="ci-close" aria-label="Bezárás">✕</button>
+  </div>
+  <h3 class="ci-name" id="ci-name"></h3>
+  <p class="ci-long" id="ci-long"></p>
+  <p class="ci-persist" id="ci-persist" hidden>
+    📌 Ez tartós szabály: cetli kerül a falra, és addig érvényes,
+    amíg elő nem kerül ugyanaz a lapérték.
+  </p>
+  <button class="btn btn-sage ci-ok" type="button" id="ci-ok">Értem 👍</button>
+</dialog>
 
 <script type="module" src="./assets/js/main.js"></script>
 </body>

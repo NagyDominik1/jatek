@@ -3,7 +3,7 @@
 ═══════════════════════════════════════════════ */
 
 import { $, esc, replay } from './dom.js';
-import { buildDeck, buildRuleSet } from './rules.js';
+import { buildDeck, buildRuleSet, CAT_META } from './rules.js';
 import * as prefs from './prefs.js';
 import * as fx from './fx.js';
 import * as players from './players.js';
@@ -349,6 +349,7 @@ function wire() {
   });
 
   wireInfo();
+  wireCardInfo();
 
   /* az AudioContext csak felhasználói gesztusra indulhat */
   addEventListener('pointerdown', () => fx.unlockAudio(), { once: true });
@@ -359,6 +360,39 @@ function wire() {
     if (e.target.matches('input, select, textarea')) return;
     if (e.key === 'Enter' && !$('next-btn').disabled) nextTurn();
   });
+}
+
+/* ═══════════════════════════════
+   LAP-RÉSZLETEK
+   A lapon csak a rövid szöveg fér el; élő helyzetben
+   viszont pont a széljegyzeteken akad meg a társaság.
+═══════════════════════════════ */
+function wireCardInfo() {
+  const btn = $('card-info-btn');
+  const dlg = $('card-info-dialog');
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();            // ne a lapfordítás kapja el
+    const rule = deck.currentRule();
+    if (!rule) return;
+
+    const meta = CAT_META[rule.cat] || CAT_META.drink;
+    dlg.style.setProperty('--cat', meta.var);
+    $('ci-badge').textContent = `${meta.emoji} ${meta.label}`;
+    $('ci-name').textContent = rule.name;
+    $('ci-long').textContent = rule.long || rule.desc;
+    $('ci-persist').hidden = !rule.persist;
+
+    dlg.showModal();
+    fx.sfx.tap();
+  });
+
+  const close = () => dlg.close();
+  $('ci-close').addEventListener('click', close);
+  $('ci-ok').addEventListener('click', close);
+
+  // háttérre kattintva is záródjon
+  dlg.addEventListener('click', e => { if (e.target === dlg) close(); });
 }
 
 /* ═══════════════════════════════

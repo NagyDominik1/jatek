@@ -687,6 +687,59 @@
   overflow-wrap: anywhere;
 }
 
+/* ── infó gomb a lapon ──
+   A lapra csak a rövid szöveg fér el. Ez a gomb nyitja a
+   részleteket — és felfordítás után pislog párat, hogy
+   észrevegyék, hogy egyáltalán létezik. */
+.card-info {
+  position: absolute;
+  right: 3.5cqw;
+  bottom: 3.5cqw;
+  z-index: 3;
+  width: max(26px, 9cqw);
+  height: max(26px, 9cqw);
+  display: grid;
+  place-items: center;
+  border: 1.5px solid color-mix(in srgb, var(--cat, var(--accent-2)) 55%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cat, var(--accent-2)) 14%, var(--card-bg));
+  color: var(--cat, var(--accent-2));
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: max(13px, 4.6cqw);
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .14s var(--spring), background .2s;
+}
+.card-info:active { transform: scale(.86); }
+@media (hover: hover) and (pointer: fine) {
+  .card-info:hover { background: color-mix(in srgb, var(--cat, var(--accent-2)) 26%, var(--card-bg)); }
+}
+
+/* pislogás: háromszor lüktet, aztán nyugton marad */
+.card-info::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--cat, var(--accent-2));
+  opacity: 0;
+  pointer-events: none;
+}
+.card-inner.flipped .card-info::after {
+  animation: infoPing 1.5s ease-out 3;
+  animation-delay: .7s;
+}
+@keyframes infoPing {
+  0%   { opacity: .75; transform: scale(.85); }
+  70%  { opacity: 0;   transform: scale(1.5); }
+  100% { opacity: 0;   transform: scale(1.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-inner.flipped .card-info::after { animation: none; }
+}
+
 .suit-h, .suit-d { color: var(--cat-duel); }
 .suit-s, .suit-c { color: var(--text); }
 
