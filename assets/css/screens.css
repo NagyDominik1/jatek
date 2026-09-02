@@ -742,6 +742,75 @@
   .card-inner.flipped .card-info::after { animation: none; }
 }
 
+/* ── időzítő a lapon ──
+   Az időre menő lapoknál (Kibírod?, Gyorstűz) a lap alsó
+   sávja. Nem indul magától: előbb el kell olvasni a lapot.
+   A jobb szélén helyet hagyunk az infó gombnak, hogy a
+   kettő ne másszon egymásra. */
+.card-timer {
+  /* Ugyanaz az alsó él és magasság, mint az infó gombé — a kettő
+     egy vonalban ül, a lap törzse pedig felettük ér véget. */
+  position: absolute;
+  left: 3.5cqw;
+  right: calc(3.5cqw + max(26px, 9cqw) + 2.5cqw);
+  bottom: 3.5cqw;
+  height: max(26px, 9cqw);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2.5cqw;
+  border: 1.5px solid color-mix(in srgb, var(--cat, var(--accent-2)) 50%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat, var(--accent-2)) 10%, var(--card-bg));
+  color: var(--cat, var(--accent-2));
+  font-family: 'DM Mono', ui-monospace, monospace;
+  /* kis lapon a felirat nem törhet két sorba: inkább mehet 9 px-ig */
+  font-size: max(9px, 3.6cqw);
+  letter-spacing: .01em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform .14s var(--spring), opacity .3s var(--ease), background .2s;
+}
+.card-timer[hidden] { display: none; }
+/* a szöveg ne fusson bele az alsó sávba */
+.card-front.has-timer .card-body { padding-bottom: calc(max(26px, 9cqw) + 2.5cqw); }
+.card-timer:active { transform: scale(.96); }
+@media (hover: hover) and (pointer: fine) {
+  .card-timer:hover { background: color-mix(in srgb, var(--cat, var(--accent-2)) 22%, var(--card-bg)); }
+}
+
+/* a fogyó csík: a hátteret futja végig, a feliratot nem takarja */
+.ct-fill {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: color-mix(in srgb, var(--cat, var(--accent-2)) 30%, transparent);
+  pointer-events: none;
+}
+.ct-label {
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+/* futás közben a szám a lényeg — nagyobb, vastagabb */
+.card-timer.is-run .ct-label {
+  font-size: max(15px, 5.4cqw);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.card-timer.is-over {
+  background: color-mix(in srgb, var(--cat, var(--accent-2)) 26%, var(--card-bg));
+  font-weight: 700;
+}
+/* egyszeri lapnál a lejárt sáv elhalványul és eltűnik */
+.card-timer.is-gone {
+  opacity: 0;
+  transform: scale(.94);
+}
+
 .suit-h, .suit-d { color: var(--cat-duel); }
 .suit-s, .suit-c { color: var(--text); }
 

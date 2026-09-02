@@ -11,6 +11,7 @@ import * as notes from './notes.js';
 import * as deck from './deck.js';
 import * as end from './end.js';
 import * as wheel from './wheel.js';
+import * as timer from './timer.js';
 import { keepAwake, registerSW } from './platform.js';
 import { initInstall } from './install.js';
 
@@ -195,6 +196,7 @@ function nextTurn() {
 ═══════════════════════════════ */
 function endGame(reason) {
   keepAwake(false);
+  timer.stop();
 
   end.render({
     reason,
@@ -300,6 +302,11 @@ function wire() {
   });
 
   $('next-btn').addEventListener('click', nextTurn);
+
+  /* Amíg fut a visszaszámlálás, a kör nem zárható le — utána
+     magától újra nyílik. A gomb alaphelyzetben is zárva van,
+     amíg nincs kifordítva a lap. */
+  timer.init({ onRun: running => { $('next-btn').disabled = running || !flipped; } });
 
   /* — tartós szabályok beállítói — */
   $('rule-word').addEventListener('input', e => {

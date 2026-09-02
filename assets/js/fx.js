@@ -114,6 +114,16 @@ export const sfx = {
       t += gap;
     }
   },
+  /* óraketyegés az utolsó másodpercekben — rövid, száraz koppanás */
+  tick() {
+    tone(880, 0, 0.05, { type: 'square', gain: 0.05 });
+  },
+  /* lejárt az idő: két éles jelzés, a végén koppanás */
+  timeUp() {
+    tone(988, 0, 0.16, { type: 'square', gain: 0.11 });
+    tone(988, 0.2, 0.16, { type: 'square', gain: 0.11 });
+    tone(494, 0.42, 0.34, { type: 'triangle', gain: 0.1, slideTo: 220 });
+  },
   /* rossz hír: ereszkedő tercek */
   doom() {
     [392, 330, 262, 196].forEach((f, i) =>

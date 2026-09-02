@@ -105,7 +105,8 @@ export const RULE_POOL = [
   { id: 'echo',   cat: 'round', name: 'Visszhang',   desc: 'Csinálj egy mozdulatot hanggal! Körben mindenki megismétli az eddigieket és hozzátesz egyet — aki elrontja, iszik! 🔁',
     long: 'Csinálj egy mozdulatot egy hanggal együtt. A következő ember megismétli a tiédet, majd hozzátesz egy sajátot. A harmadik már kettőt ismétel és tesz hozzá egyet, és így tovább. Aki elrontja a sorrendet vagy kihagy egyet, iszik.' },
   { id: 'rapid',  cat: 'round', name: 'Gyorstűz',   desc: 'Adj egy témát a melletted ülőnek — 5 másodperce van 3 dolgot sorolni! Ha nem megy, iszik. ⚡',
-    long: 'Mondj egy témát a melletted ülőnek: sörmárkák, Balaton-parti városok, filmek Bruce Willisszel, bármi. Neki öt másodperce van rá, hogy hármat felsoroljon belőle. Ha sikerül, ő ad új témát a következőnek, és megy tovább a kör; ha nem fér bele az időbe, iszik egyet — és úgy is ő adja a következő témát.' },
+    long: 'Mondj egy témát a melletted ülőnek: sörmárkák, Balaton-parti városok, filmek Bruce Willisszel, bármi. Neki öt másodperce van rá, hogy hármat felsoroljon belőle. Ha sikerül, ő ad új témát a következőnek, és megy tovább a kör; ha nem fér bele az időbe, iszik egyet — és úgy is ő adja a következő témát.',
+    timer: { sec: 5, repeat: true } },
 
   /* ── társasági ─────────────────────────────── */
   { id: 'never',  cat: 'social', name: 'Soha Nem Voltam',  desc: '3 ujj fel! Mondj valamit amit te nem csináltál — aki csinálta, lehajt egy ujjat és iszik! ✋',
@@ -125,7 +126,8 @@ export const RULE_POOL = [
   { id: 'duel',    cat: 'duel', name: 'Párbaj',            desc: 'Hívj ki valakit kő-papír-ollóra! A vesztes iszik. ⚔️',
     long: 'Hívj ki valakit egy kör kő-papír-ollóra. A vesztes iszik egyet. Döntetlennél újra kell játszani, amíg meg nem lesz a győztes — az egymás utáni döntetlenek nem számítanak bele.' },
   { id: 'laugh',   cat: 'duel', name: 'Kibírod?',          desc: '30 másodpercig nem nevethetsz — a többiek mindent megtesznek, hogy megnevettessenek. Ha elmosolyodsz, iszol! 😐',
-    long: 'Indul egy 30 másodperces visszaszámlálás, ami alatt neked kőarcot kell vágnod. A többiek bármit bevethetnek — grimaszt, sztorit, hangokat —, de hozzád nem érhetnek. Ha elmosolyodsz vagy felnevetsz, iszol egyet; ha kibírod, megúsztad.' },
+    long: 'Indul egy 30 másodperces visszaszámlálás, ami alatt neked kőarcot kell vágnod. A többiek bármit bevethetnek — grimaszt, sztorit, hangokat —, de hozzád nem érhetnek. Ha elmosolyodsz vagy felnevetsz, iszol egyet; ha kibírod, megúsztad.',
+    timer: { sec: 30 } },
   { id: 'fingers', cat: 'duel', name: 'Kacsaszám',         desc: 'Tippelj meg egy számot hangosan! Háromra mindenki mutat 0–5 ujjat — ha eltaláltad az összeget, mindenki más iszik, ha nem, te! 🔢',
     long: 'Mondj hangosan egy tippet arra, mennyi lesz az összes felmutatott ujj száma. Háromra mindenki mutat 0 és 5 közötti ujjat, te is. Ha eltaláltad az összeget, mindenki más iszik egyet; ha nem, egyedül te.' },
   { id: 'stare',   cat: 'duel', name: 'Szemezés',          desc: 'Válassz valakit és nézzetek egymás szemébe! Aki előbb elkapja a tekintetét vagy elmosolyodik, iszik. 👀',

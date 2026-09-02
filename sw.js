@@ -11,7 +11,7 @@
    kell (vagy kiüríted a cache-t), emeld a VERSION-t.
 ═══════════════════════════════════════════════ */
 
-const VERSION = 'v19';
+const VERSION = 'v20';
 const SHELL = `kingscup-shell-${VERSION}`;
 const FONTS = `kingscup-fonts-${VERSION}`;
 
@@ -35,6 +35,7 @@ const ASSETS = [
   './assets/js/players.js',
   './assets/js/notes.js',
   './assets/js/deck.js',
+  './assets/js/timer.js',
   './assets/js/end.js',
   './assets/js/wheel.js',
   './assets/js/platform.js',

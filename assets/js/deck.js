@@ -4,6 +4,7 @@
 
 import { $ } from './dom.js';
 import { CAT_META } from './rules.js';
+import * as timer from './timer.js';
 
 const MAX_CARD_W = 310;
 const MIN_CARD_W = 124;
@@ -57,11 +58,15 @@ export function renderFront(card, rule) {
   $('card-rule').textContent = rule.name;
   $('card-desc').textContent = rule.desc;
 
+  // az időzítő sávja is helyet foglal a lapon — a méretezés előtt kell tudni róla
+  timer.attach(rule);
+
   fitCard();
 }
 
 export function clearFront() {
   current = null;
+  timer.stop();
   $('card-sv').textContent = '';
   $('card-badge').textContent = '';
   $('card-rule').textContent = '';
