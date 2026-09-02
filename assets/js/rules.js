@@ -104,8 +104,8 @@ export const RULE_POOL = [
     long: 'Kezdj egy mondatot egyetlen szóval. Körben mindenki hozzátesz pontosan egy szót. Aki lezárja a mondatot, aki elakad, vagy aki teljesen értelmetlenné teszi, iszik egyet.' },
   { id: 'echo',   cat: 'round', name: 'Visszhang',   desc: 'Csinálj egy mozdulatot hanggal! Körben mindenki megismétli az eddigieket és hozzátesz egyet — aki elrontja, iszik! 🔁',
     long: 'Csinálj egy mozdulatot egy hanggal együtt. A következő ember megismétli a tiédet, majd hozzátesz egy sajátot. A harmadik már kettőt ismétel és tesz hozzá egyet, és így tovább. Aki elrontja a sorrendet vagy kihagy egyet, iszik.' },
-  { id: 'count',  cat: 'round', name: 'Bomba',       desc: 'Számoljatok körben 1-től! A 7-re és minden 7-tel oszthatóra tapsolni kell szám helyett — aki elrontja, iszik! 💣',
-    long: 'Számoljatok körben egyesével, egytől indulva. A 7-re és minden 7-tel oszthatóra (7, 14, 21…) szám helyett tapsolni kell. Aki kimondja a számot, rosszkor tapsol vagy sokáig gondolkodik, iszik — és tőle indul újra egytől.' },
+  { id: 'rapid',  cat: 'round', name: 'Gyorstűz',   desc: 'Adj egy témát a melletted ülőnek — 5 másodperce van 3 dolgot sorolni! Ha nem megy, iszik. ⚡',
+    long: 'Mondj egy témát a melletted ülőnek: sörmárkák, Balaton-parti városok, filmek Bruce Willisszel, bármi. Neki öt másodperce van rá, hogy hármat felsoroljon belőle. Ha sikerül, ő ad új témát a következőnek, és megy tovább a kör; ha nem fér bele az időbe, iszik egyet — és úgy is ő adja a következő témát.' },
 
   /* ── társasági ─────────────────────────────── */
   { id: 'never',  cat: 'social', name: 'Soha Nem Voltam',  desc: '3 ujj fel! Mondj valamit amit te nem csináltál — aki csinálta, lehajt egy ujjat és iszik! ✋',
